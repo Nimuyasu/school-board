@@ -10,12 +10,12 @@
 html,body{
   margin:0;
   height:100%;
-  overflow:hidden;
 }
 
 body{
   font-family:'Kosugi Maru',sans-serif;
   background:linear-gradient(135deg,#d9f3ff,#fff7d6);
+  background-attachment:fixed;
 }
 
 /* 左上 */
@@ -44,25 +44,22 @@ body{
   cursor:pointer;
 }
 
-/* 上 */
-.top{
-  text-align:center;
-  height:18vh;
-}
+/* 上部 */
+.top{text-align:center;}
 
 .date{
-  font-size:2vw;
+  font-size:2.2vw;
+  padding-top:15px;
 }
 
 .clock{
-  font-size:9vw;
+  font-size:11vw;
   font-weight:900;
 }
 
-/* メイン */
+/* レイアウト */
 .main{
   display:flex;
-  height:82vh;
   gap:1vw;
   padding:1vw;
 }
@@ -77,38 +74,42 @@ body{
   flex:1;
   background:white;
   border-radius:20px;
-  padding:1vw;
+  padding:1.2vw;
 }
 
 .header{
-  text-align:center;
-  font-size:1.8vw;
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  font-size:2vw;
 }
 
 .type{
-  font-size:1.2vw;
-  color:#666;
+  font-size:1.4vw;
+  color:#555;
 }
 
 /* 行 */
 .row{
   display:grid;
   grid-template-columns:30% 70%;
-  font-size:2vw;
+  font-size:2.6vw;
   align-items:center;
-  height:5vh;
+  padding:6px 0;
+  min-height:3.5vw;
 }
 
 .row div:first-child{
-  font-size:1.2vw;
+  font-size:1.5vw;
 }
 
 /* 予定 */
 .plan{
-  font-size:1.8vw;
+  font-size:2.2vw;
   background:#fff3cd;
-  margin-top:1vh;
+  border-radius:10px;
   padding:6px;
+  margin-top:8px;
 }
 
 /* 右 */
@@ -128,22 +129,23 @@ body{
 }
 
 .big{
-  font-size:4vw;
+  font-size:5vw;
   font-weight:900;
 }
 
 button{
   border:none;
-  border-radius:10px;
+  border-radius:12px;
   padding:4px 8px;
   margin:2px;
-  font-size:0.9vw;
+  font-size:1vw;
   background:linear-gradient(135deg,#74ebd5,#9face6);
   color:white;
 }
 
 input{
   font-size:1vw;
+  padding:4px;
 }
 </style>
 </head>
@@ -156,23 +158,23 @@ input{
 </div>
 
 <div class="top">
-  <div id="date"></div>
-  <div id="clock"></div>
+  <div class="date" id="date"></div>
+  <div class="clock" id="clock"></div>
 </div>
 
 <div class="main">
 
 <div class="left">
   <div class="card">
-    <div id="todayHeader"></div>
+    <div class="header" id="todayHeader"></div>
     <div id="today"></div>
-    <div id="todayPlan"></div>
+    <div class="plan" id="todayPlan"></div>
   </div>
 
   <div class="card">
-    <div id="tomorrowHeader"></div>
+    <div class="header" id="tomorrowHeader"></div>
     <div id="tomorrow"></div>
-    <div id="tomorrowPlan"></div>
+    <div class="plan" id="tomorrowPlan"></div>
   </div>
 </div>
 
@@ -220,12 +222,9 @@ function reloadData(){
   load();
 }
 
-// 日本時間キー
+// 日本時間
 function getJPDateKey(d){
-  const y=d.getFullYear();
-  const m=String(d.getMonth()+1).padStart(2,'0');
-  const day=String(d.getDate()).padStart(2,'0');
-  return `${y}-${m}-${day}`;
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,'0')+"-"+String(d.getDate()).padStart(2,'0');
 }
 
 // 時計
