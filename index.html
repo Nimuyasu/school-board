@@ -44,7 +44,7 @@ body{
   cursor:pointer;
 }
 
-/* 上部 */
+/* 上 */
 .top{text-align:center;}
 
 .date{
@@ -79,17 +79,25 @@ body{
 }
 
 .header{
-  text-align:center;
+  display:flex;
+  justify-content:center;
+  gap:10px;
   font-size:2vw;
 }
 
-/* 日課行 */
+.type{
+  font-size:1.4vw;
+  color:#555;
+}
+
+/* 行 */
 .row{
   display:grid;
   grid-template-columns:30% 70%;
   font-size:2.6vw;
   align-items:center;
   padding:6px 0;
+  min-height:3.5vw; /* ←高さ固定 */
 }
 
 .row div:first-child{
@@ -172,7 +180,6 @@ input{
 </div>
 
 <div class="right">
-
 <div class="tool">
   <div class="big" id="timer">00:00</div>
   <button onclick="addTime(600)">10分</button>
@@ -195,8 +202,8 @@ input{
   <input id="max" type="number" value="40">
   <button onclick="draw()">抽選</button>
 </div>
-
 </div>
+
 </div>
 
 <script>
@@ -236,7 +243,7 @@ async function fetchData(){
     if(!r.trim()) continue;
 
     const cols=r.split(",");
-    if(cols.length<8) continue;
+    if(cols.length<9) continue;
 
     const date=cols[0];
     const cls=cols[1];
@@ -252,9 +259,17 @@ async function fetchData(){
 // 表示
 function render(id,row){
   let h="";
+
   for(let i=0;i<6;i++){
-    h+=`<div class="row"><div>${i+1}時間目</div><div>${row[i]||""}</div></div>`;
+    const subject=row[i]||"";
+
+    if(subject===""){
+      h+=`<div class="row"><div></div><div></div></div>`;
+    }else{
+      h+=`<div class="row"><div>${i+1}時間目</div><div>${subject}</div></div>`;
+    }
   }
+
   document.getElementById(id).innerHTML=h;
 }
 
@@ -262,7 +277,6 @@ function render(id,row){
 async function load(){
   const all=await fetchData();
 
-  // リセット
   today.innerHTML="";
   tomorrow.innerHTML="";
   todayPlan.textContent="";
@@ -271,23 +285,35 @@ async function load(){
   tomorrowHeader.textContent="";
 
   const todayDate=new Date();
-  const todayKey=todayDate.toISOString().slice(0,10);
+  const key=todayDate.toISOString().slice(0,10);
 
-  if(all[todayKey]){
-    render("today",all[todayKey]);
-    todayHeader.textContent=todayDate.toLocaleDateString('ja-JP',{month:'numeric',day:'numeric',weekday:'short'});
-    todayPlan.textContent=(all[todayKey][7]||"");
+  if(all[key]){
+    const row=all[key];
+
+    render("today",row);
+
+    todayHeader.innerHTML=
+      todayDate.toLocaleDateString('ja-JP',{month:'numeric',day:'numeric',weekday:'short'})
+      + `<span class="type">${row[6]||""}</span>`;
+
+    todayPlan.textContent=(row[7]||"");
   }
 
   let d=new Date();
   for(let i=0;i<40;i++){
     d.setDate(d.getDate()+1);
-    const key=d.toISOString().slice(0,10);
+    const k=d.toISOString().slice(0,10);
 
-    if(all[key]){
-      render("tomorrow",all[key]);
-      tomorrowHeader.textContent=d.toLocaleDateString('ja-JP',{month:'numeric',day:'numeric',weekday:'short'});
-      tomorrowPlan.textContent=(all[key][7]||"");
+    if(all[k]){
+      const row=all[k];
+
+      render("tomorrow",row);
+
+      tomorrowHeader.innerHTML=
+        d.toLocaleDateString('ja-JP',{month:'numeric',day:'numeric',weekday:'short'})
+        + `<span class="type">${row[6]||""}</span>`;
+
+      tomorrowPlan.textContent=(row[7]||"");
       break;
     }
   }
@@ -295,7 +321,7 @@ async function load(){
 
 load();
 
-/* ツール */
+/* ツール（そのまま） */
 let t=0,ti;
 function updateTimer(){timer.textContent=String(Math.floor(t/60)).padStart(2,'0')+":"+String(t%60).padStart(2,'0');}
 function startTimer(){clearInterval(ti);ti=setInterval(()=>{if(t<=0){clearInterval(ti);beep();return;}t--;updateTimer();},1000);}
