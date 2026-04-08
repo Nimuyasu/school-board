@@ -60,38 +60,49 @@ body{
 /* レイアウト */
 .main{
   display:flex;
-  height:78vh;
+  min-height:78vh;
   gap:1vw;
   padding:1vw;
 }
 
-.left{flex:2;display:flex;gap:1vw;}
+.left{
+  flex:2;
+  display:flex;
+  gap:1vw;
+}
 
 .card{
   flex:1;
   background:white;
   border-radius:20px;
-  padding:1vw;
+  padding:1.2vw;
 }
 
-.header{text-align:center;font-size:2vw;}
+.header{
+  text-align:center;
+  font-size:2vw;
+}
 
+/* 日課行 */
 .row{
   display:grid;
   grid-template-columns:30% 70%;
   font-size:2.6vw;
   align-items:center;
+  padding:6px 0;
 }
 
 .row div:first-child{
   font-size:1.5vw;
 }
 
+/* 予定 */
 .plan{
   font-size:2.2vw;
   background:#fff3cd;
   border-radius:10px;
-  padding:5px;
+  padding:6px;
+  margin-top:8px;
 }
 
 /* 右 */
@@ -213,7 +224,7 @@ setInterval(()=>{
     ["日","月","火","水","木","金","土"][n.getDay()]+"）";
 },1000);
 
-// データ取得（安全版）
+// データ取得
 async function fetchData(){
   const res=await fetch(SHEET_URL);
   const text=await res.text();
@@ -222,10 +233,10 @@ async function fetchData(){
   let data={};
 
   for(let r of rows){
-    if(!r.trim()) continue; // 空行スキップ
+    if(!r.trim()) continue;
 
     const cols=r.split(",");
-    if(cols.length<8) continue; // 不完全行スキップ
+    if(cols.length<8) continue;
 
     const date=cols[0];
     const cls=cols[1];
@@ -251,23 +262,32 @@ function render(id,row){
 async function load(){
   const all=await fetchData();
 
-  const today=new Date();
-  const key=today.toISOString().slice(0,10);
+  // リセット
+  today.innerHTML="";
+  tomorrow.innerHTML="";
+  todayPlan.textContent="";
+  tomorrowPlan.textContent="";
+  todayHeader.textContent="";
+  tomorrowHeader.textContent="";
 
-  if(all[key]){
-    render("today",all[key]);
-    todayHeader.textContent=today.toLocaleDateString('ja-JP',{month:'numeric',day:'numeric',weekday:'short'});
-    todayPlan.textContent=(all[key][7]||"");
+  const todayDate=new Date();
+  const todayKey=todayDate.toISOString().slice(0,10);
+
+  if(all[todayKey]){
+    render("today",all[todayKey]);
+    todayHeader.textContent=todayDate.toLocaleDateString('ja-JP',{month:'numeric',day:'numeric',weekday:'short'});
+    todayPlan.textContent=(all[todayKey][7]||"");
   }
 
   let d=new Date();
   for(let i=0;i<40;i++){
     d.setDate(d.getDate()+1);
-    const k=d.toISOString().slice(0,10);
-    if(all[k]){
-      render("tomorrow",all[k]);
+    const key=d.toISOString().slice(0,10);
+
+    if(all[key]){
+      render("tomorrow",all[key]);
       tomorrowHeader.textContent=d.toLocaleDateString('ja-JP',{month:'numeric',day:'numeric',weekday:'short'});
-      tomorrowPlan.textContent=(all[k][7]||"");
+      tomorrowPlan.textContent=(all[key][7]||"");
       break;
     }
   }
@@ -275,7 +295,7 @@ async function load(){
 
 load();
 
-// ツール（省略なし）
+/* ツール */
 let t=0,ti;
 function updateTimer(){timer.textContent=String(Math.floor(t/60)).padStart(2,'0')+":"+String(t%60).padStart(2,'0');}
 function startTimer(){clearInterval(ti);ti=setInterval(()=>{if(t<=0){clearInterval(ti);beep();return;}t--;updateTimer();},1000);}
