@@ -10,7 +10,7 @@
 html,body{
   margin:0;
   height:100%;
-  overflow:hidden; /* ←スクロール禁止 */
+  overflow:hidden;
 }
 
 body{
@@ -18,7 +18,33 @@ body{
   background:linear-gradient(135deg,#d9f3ff,#fff7d6);
 }
 
-/* 上部 */
+/* 左上 */
+#topLeft{
+  position:absolute;
+  left:20px;
+  top:10px;
+  display:flex;
+  gap:8px;
+}
+
+#classSelect{
+  font-size:2vw;
+  border:none;
+  background:transparent;
+}
+
+.iconBtn{
+  width:34px;
+  height:34px;
+  border:none;
+  border-radius:50%;
+  background:#6fa8dc;
+  color:white;
+  font-size:18px;
+  cursor:pointer;
+}
+
+/* 上 */
 .top{
   text-align:center;
   height:18vh;
@@ -26,7 +52,6 @@ body{
 
 .date{
   font-size:2vw;
-  margin-top:1vh;
 }
 
 .clock{
@@ -34,27 +59,12 @@ body{
   font-weight:900;
 }
 
-/* 左上 */
-#topLeft{
-  position:absolute;
-  left:20px;
-  top:10px;
-}
-
-#classSelect{
-  font-size:1.8vw;
-}
-
-.iconBtn{
-  font-size:1.8vw;
-}
-
 /* メイン */
 .main{
   display:flex;
-  height:82vh; /* ←固定 */
-  padding:1vw;
+  height:82vh;
   gap:1vw;
+  padding:1vw;
 }
 
 .left{
@@ -66,7 +76,7 @@ body{
 .card{
   flex:1;
   background:white;
-  border-radius:15px;
+  border-radius:20px;
   padding:1vw;
 }
 
@@ -80,13 +90,13 @@ body{
   color:#666;
 }
 
-/* 日課 */
+/* 行 */
 .row{
   display:grid;
   grid-template-columns:30% 70%;
   font-size:2vw;
   align-items:center;
-  height:5vh; /* ←高さ固定 */
+  height:5vh;
 }
 
 .row div:first-child{
@@ -98,7 +108,7 @@ body{
   font-size:1.8vw;
   background:#fff3cd;
   margin-top:1vh;
-  padding:5px;
+  padding:6px;
 }
 
 /* 右 */
@@ -112,17 +122,28 @@ body{
 .tool{
   flex:1;
   background:white;
-  border-radius:15px;
-  padding:0.5vw;
+  border-radius:20px;
+  padding:0.7vw;
   text-align:center;
 }
 
 .big{
   font-size:4vw;
+  font-weight:900;
 }
 
 button{
+  border:none;
+  border-radius:10px;
+  padding:4px 8px;
+  margin:2px;
   font-size:0.9vw;
+  background:linear-gradient(135deg,#74ebd5,#9face6);
+  color:white;
+}
+
+input{
+  font-size:1vw;
 }
 </style>
 </head>
@@ -131,7 +152,7 @@ button{
 
 <div id="topLeft">
   <select id="classSelect"></select>
-  <button onclick="reloadData()">⟳</button>
+  <button class="iconBtn" onclick="reloadData()">⟳</button>
 </div>
 
 <div class="top">
@@ -156,34 +177,55 @@ button{
 </div>
 
 <div class="right">
-  <div class="tool">
-    <div class="big" id="timer">00:00</div>
-  </div>
+
+<div class="tool">
+  <div class="big" id="timer">00:00</div>
+  <button onclick="addTime(600)">10分</button>
+  <button onclick="addTime(60)">1分</button>
+  <button onclick="addTime(10)">10秒</button>
+  <button onclick="addTime(1)">1秒</button><br>
+  <button onclick="startTimer()">開始</button>
+  <button onclick="resetTimer()">リセット</button>
 </div>
 
+<div class="tool">
+  <div class="big" id="sw">00:00.0</div>
+  <button onclick="swStart()">開始</button>
+  <button onclick="swStop()">停止</button>
+  <button onclick="swReset()">リセット</button>
+</div>
+
+<div class="tool">
+  <div class="big" id="result">-</div>
+  <input id="max" type="number" value="40">
+  <button onclick="draw()">抽選</button>
+</div>
+
+</div>
 </div>
 
 <script>
-// ===== 日本時間の日付関数 =====
-function getJPDateKey(d){
-  const y=d.getFullYear();
-  const m=String(d.getMonth()+1).padStart(2,'0');
-  const day=String(d.getDate()).padStart(2,'0');
-  return `${y}-${m}-${day}`;
-}
+const SHEET_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6hu2HGH9XN1d3Pj8euPrv49TgqM-GsPJNqge6IiRoqvXpNWuRFteTEufF-ffT5WDpYtG4W25h4bxI/pub?output=csv";
 
-const SHEET_URL="あなたのURL";
+const classList=["1-1","1-2","1-3","1-4","2-1","2-2","2-3","2-4","3-1","3-2","3-3","3-4","s-1","s-2","s-3","a-1","a-2","a-3"];
 
-const classList=["3-1"];
 let classId="3-1";
 
 classList.forEach(c=>{
-  classSelect.innerHTML+=`<option>${c}</option>`;
+  classSelect.innerHTML+=`<option value="${c}">${c}</option>`;
 });
 
 function reloadData(){
   classId=classSelect.value;
   load();
+}
+
+// 日本時間キー
+function getJPDateKey(d){
+  const y=d.getFullYear();
+  const m=String(d.getMonth()+1).padStart(2,'0');
+  const day=String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
 }
 
 // 時計
@@ -205,6 +247,8 @@ async function fetchData(){
     if(!r.trim()) continue;
 
     const c=r.split(",");
+    if(c.length<9) continue;
+
     if(c[1]!==classId) continue;
 
     data[c[0]]=c.slice(2);
@@ -227,13 +271,26 @@ function render(id,row){
 async function load(){
   const all=await fetchData();
 
-  const today=new Date();
-  const key=getJPDateKey(today);
+  today.innerHTML="";
+  tomorrow.innerHTML="";
+  todayPlan.textContent="";
+  tomorrowPlan.textContent="";
+  todayHeader.textContent="";
+  tomorrowHeader.textContent="";
+
+  const todayDate=new Date();
+  const key=getJPDateKey(todayDate);
 
   if(all[key]){
-    render("today",all[key]);
-    todayHeader.textContent=key;
-    todayPlan.textContent=all[key][7]||"";
+    const row=all[key];
+
+    render("today",row);
+
+    todayHeader.innerHTML=
+      todayDate.toLocaleDateString('ja-JP',{month:'numeric',day:'numeric',weekday:'short'})
+      + ` <span class="type">${row[6]||""}</span>`;
+
+    todayPlan.textContent=(row[7]||"");
   }
 
   let d=new Date();
@@ -242,15 +299,52 @@ async function load(){
     const k=getJPDateKey(d);
 
     if(all[k]){
-      render("tomorrow",all[k]);
-      tomorrowHeader.textContent=k;
-      tomorrowPlan.textContent=all[k][7]||"";
+      const row=all[k];
+
+      render("tomorrow",row);
+
+      tomorrowHeader.innerHTML=
+        d.toLocaleDateString('ja-JP',{month:'numeric',day:'numeric',weekday:'short'})
+        + ` <span class="type">${row[6]||""}</span>`;
+
+      tomorrowPlan.textContent=(row[7]||"");
       break;
     }
   }
 }
 
 load();
+
+/* ツール */
+let t=0,ti;
+function updateTimer(){timer.textContent=String(Math.floor(t/60)).padStart(2,'0')+":"+String(t%60).padStart(2,'0');}
+function startTimer(){clearInterval(ti);ti=setInterval(()=>{if(t<=0){clearInterval(ti);beep();return;}t--;updateTimer();},1000);}
+function resetTimer(){clearInterval(ti);t=0;updateTimer();}
+function addTime(s){t+=s;updateTimer();}
+
+function beep(){
+  const ctx=new AudioContext();
+  let c=0;
+  const i=setInterval(()=>{
+    const o=ctx.createOscillator();
+    o.frequency.value=1500;
+    o.connect(ctx.destination);
+    o.start();
+    setTimeout(()=>o.stop(),100);
+    if(++c>=16) clearInterval(i);
+  },150);
+}
+
+let swt=0,swi;
+function swUpdate(){sw.textContent=String(Math.floor(swt/600)).padStart(2,'0')+":"+String(Math.floor(swt/10)%60).padStart(2,'0')+"."+(swt%10);}
+function swStart(){if(swi)return;swi=setInterval(()=>{swt++;swUpdate();},100);}
+function swStop(){clearInterval(swi);swi=null;}
+function swReset(){swStop();swt=0;swUpdate();}
+
+function draw(){
+  const max=document.getElementById("max").value;
+  result.textContent=Math.floor(Math.random()*max)+1;
+}
 </script>
 
 </body>
