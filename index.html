@@ -56,18 +56,38 @@ body{
   padding:1.2vw;
 }
 
-.header{text-align:center;font-size:2vw;}
+.header{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:10px;
+  font-size:2vw;
+}
 
+.scheduleType{
+  font-size:1.4vw;
+  color:#555;
+}
+
+/* 行 */
 .row{
   display:grid;
   grid-template-columns:30% 70%;
   font-size:2.6vw;
   align-items:center;
-  padding:6px 0;
+  padding:8px 0;
+  min-height:2.8vw; /* ←高さ固定 */
 }
 
-.row div:first-child{font-size:1.5vw;}
+.row div:first-child{
+  font-size:1.5vw;
+}
 
+.subject{
+  min-height:2.8vw; /* ←空欄でも高さ維持 */
+}
+
+/* 予定 */
 .plan{
   font-size:2.2vw;
   background:#fff3cd;
@@ -106,8 +126,6 @@ button{
   background:linear-gradient(135deg,#74ebd5,#9face6);
   color:white;
 }
-
-input{font-size:1vw;padding:4px;}
 </style>
 </head>
 
@@ -127,13 +145,19 @@ input{font-size:1vw;padding:4px;}
 
 <div class="left">
   <div class="card">
-    <div class="header" id="todayHeader"></div>
+    <div class="header">
+      <span id="todayHeader"></span>
+      <span class="scheduleType" id="todayType"></span>
+    </div>
     <div id="today"></div>
     <div class="plan" id="todayPlan"></div>
   </div>
 
   <div class="card">
-    <div class="header" id="tomorrowHeader"></div>
+    <div class="header">
+      <span id="tomorrowHeader"></span>
+      <span class="scheduleType" id="tomorrowType"></span>
+    </div>
     <div id="tomorrow"></div>
     <div class="plan" id="tomorrowPlan"></div>
   </div>
@@ -141,7 +165,6 @@ input{font-size:1vw;padding:4px;}
 
 <div class="right">
 
-<!-- タイマー -->
 <div class="tool">
   <div class="big" id="timer">00:00</div>
   <button onclick="addTime(600)">+10分</button>
@@ -152,7 +175,6 @@ input{font-size:1vw;padding:4px;}
   <button onclick="resetTimer()">リセット</button>
 </div>
 
-<!-- ストップウォッチ -->
 <div class="tool">
   <div class="big" id="sw">00:00.0</div>
   <button onclick="swStart()">開始</button>
@@ -160,17 +182,13 @@ input{font-size:1vw;padding:4px;}
   <button onclick="swReset()">リセット</button>
 </div>
 
-<!-- 抽選 -->
 <div class="tool">
   <div class="big" id="result">-</div>
-
   <div id="maxDisplay">最大：40</div>
-
   <button onclick="changeMax(-10)">-10</button>
   <button onclick="changeMax(-1)">-1</button>
   <button onclick="changeMax(1)">+1</button>
   <button onclick="changeMax(10)">+10</button><br>
-
   <button onclick="draw()">抽選</button>
   <button onclick="resetDraw()">リセット</button>
 </div>
@@ -213,7 +231,7 @@ async function fetchData(){
   for(let r of rows){
     if(!r.trim()) continue;
     const cols=r.split(",");
-    if(cols.length<8) continue;
+    if(cols.length<10) continue;
 
     const date=cols[0];
     const cls=cols[1];
@@ -229,18 +247,13 @@ async function fetchData(){
 function render(id,row){
   let h="";
   for(let i=0;i<6;i++){
-    h+=`<div class="row"><div>${i+1}時間目</div><div>${row[i]||""}</div></div>`;
+    h+=`<div class="row"><div>${i+1}時間目</div><div class="subject">${row[i]||""}</div></div>`;
   }
   document.getElementById(id).innerHTML=h;
 }
 
 /* メイン */
-let loading=false;
-
 async function load(){
-  if(loading) return;
-  loading=true;
-
   const all=await fetchData();
 
   today.innerHTML="";
@@ -249,92 +262,34 @@ async function load(){
   tomorrowPlan.textContent="";
   todayHeader.textContent="";
   tomorrowHeader.textContent="";
+  todayType.textContent="";
+  tomorrowType.textContent="";
 
-  const todayDate=new Date();
-  const todayKey=todayDate.toISOString().slice(0,10);
+  const t=new Date();
+  const key=t.toISOString().slice(0,10);
 
-  if(all[todayKey]){
-    render("today",all[todayKey]);
-    todayHeader.textContent=todayDate.toLocaleDateString('ja-JP',{month:'numeric',day:'numeric',weekday:'short'});
-    todayPlan.textContent=(all[todayKey][7]||"");
+  if(all[key]){
+    render("today",all[key]);
+    todayHeader.textContent=t.toLocaleDateString('ja-JP',{month:'numeric',day:'numeric',weekday:'short'});
+    todayType.textContent=all[key][6]||"";
+    todayPlan.textContent=all[key][7]||"";
   }
 
   let d=new Date();
   for(let i=0;i<40;i++){
     d.setDate(d.getDate()+1);
-    const key=d.toISOString().slice(0,10);
-
-    if(all[key]){
-      render("tomorrow",all[key]);
+    const k=d.toISOString().slice(0,10);
+    if(all[k]){
+      render("tomorrow",all[k]);
       tomorrowHeader.textContent=d.toLocaleDateString('ja-JP',{month:'numeric',day:'numeric',weekday:'short'});
-      tomorrowPlan.textContent=(all[key][7]||"");
+      tomorrowType.textContent=all[k][6]||"";
+      tomorrowPlan.textContent=all[k][7]||"";
       break;
     }
   }
-
-  loading=false;
 }
 
 load();
-
-/* タイマー */
-let t=0,ti;
-function updateTimer(){timer.textContent=String(Math.floor(t/60)).padStart(2,'0')+":"+String(t%60).padStart(2,'0');}
-function startTimer(){
-  if(ti) return;
-  ti=setInterval(()=>{
-    if(t<=0){
-      clearInterval(ti);
-      ti=null;
-      beep();
-      return;
-    }
-    t--;
-    updateTimer();
-  },1000);
-}
-function resetTimer(){clearInterval(ti);ti=null;t=0;updateTimer();}
-function addTime(s){t+=s;updateTimer();}
-
-/* 音（ピピピピ×6） */
-let audioCtx;
-function beep(){
-  if(!audioCtx) audioCtx=new AudioContext();
-  let count=0;
-  const play=()=>{
-    const o=audioCtx.createOscillator();
-    o.frequency.value=2000;
-    o.connect(audioCtx.destination);
-    o.start();
-    setTimeout(()=>o.stop(),80);
-    if(++count<24) setTimeout(play,120);
-  };
-  play();
-}
-
-/* ストップウォッチ */
-let swt=0,swi;
-function swUpdate(){sw.textContent=String(Math.floor(swt/600)).padStart(2,'0')+":"+String(Math.floor(swt/10)%60).padStart(2,'0')+"."+(swt%10);}
-function swStart(){if(swi) return;swi=setInterval(()=>{swt++;swUpdate();},100);}
-function swStop(){clearInterval(swi);swi=null;}
-function swReset(){swStop();swt=0;swUpdate();}
-
-/* 抽選 */
-let maxNum=40;
-
-function changeMax(n){
-  maxNum+=n;
-  if(maxNum<1) maxNum=1;
-  maxDisplay.textContent="最大："+maxNum;
-}
-
-function draw(){
-  result.textContent=Math.floor(Math.random()*maxNum)+1;
-}
-
-function resetDraw(){
-  result.textContent="-";
-}
 </script>
 
 </body>
