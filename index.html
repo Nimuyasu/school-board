@@ -14,7 +14,6 @@ body{
   background-attachment:fixed;
 }
 
-/* 左上 */
 #topLeft{
   position:absolute;
   left:20px;
@@ -34,12 +33,10 @@ body{
   background:#6fa8dc;color:white;font-size:18px;cursor:pointer;
 }
 
-/* 上 */
 .top{text-align:center;}
 .date{font-size:2.2vw;padding-top:15px;}
 .clock{font-size:11vw;font-weight:900;}
 
-/* レイアウト */
 .main{
   display:flex;
   min-height:78vh;
@@ -56,15 +53,13 @@ body{
   padding:1.2vw;
 }
 
-/* ヘッダー */
 .header{
   display:flex;
   justify-content:center;
   gap:10px;
-  font-size:2vw; /* ←日付と同じサイズ */
+  font-size:2vw;
 }
 
-/* 行 */
 .row{
   display:grid;
   grid-template-columns:30% 70%;
@@ -75,12 +70,8 @@ body{
 }
 
 .row div:first-child{font-size:1.5vw;}
+.subject{min-height:2.8vw;}
 
-.subject{
-  min-height:2.8vw;
-}
-
-/* 予定 */
 .plan{
   font-size:2.2vw;
   background:#fff3cd;
@@ -89,7 +80,6 @@ body{
   margin-top:8px;
 }
 
-/* 右 */
 .right{
   flex:1;
   display:flex;
@@ -157,7 +147,6 @@ button{
 </div>
 
 <div class="right">
-
 <div class="tool">
   <div class="big" id="timer">00:00</div>
   <button onclick="addTime(600)">+10分</button>
@@ -185,13 +174,15 @@ button{
   <button onclick="draw()">抽選</button>
   <button onclick="resetDraw()">リセット</button>
 </div>
-
 </div>
+
 </div>
 
 <script>
-// ===== クラス =====
+const SHEET_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6hu2HGH9XN1d3Pj8euPrv49TgqM-GsPJNqge6IiRoqvXpNWuRFteTEufF-ffT5WDpYtG4W25h4bxI/pub?gid=0&single=true&output=csv";
+
 const classList=["1-1","1-2","1-3","1-4","2-1","2-2","2-3","2-4","3-1","3-2","3-3","3-4","s-1","s-2","s-3","a-1","a-2","a-3"];
+
 let classId="3-1";
 
 classList.forEach(c=>{
@@ -203,7 +194,7 @@ function reloadData(){
   load();
 }
 
-// 時計
+/* 時計 */
 setInterval(()=>{
   const n=new Date();
   clock.textContent=n.toLocaleTimeString('ja-JP');
@@ -211,32 +202,85 @@ setInterval(()=>{
   ["日","月","火","水","木","金","土"][n.getDay()]+"）";
 },1000);
 
-// ===== ダミー（動作確認用）=====
-function load(){
-  today.innerHTML="<div class='row'><div>1時間目</div><div class='subject'>国語</div></div>";
-  todayHeader.textContent="4/9（水）";
-  todayType.textContent="通常時程";
+/* CSV取得 */
+async function fetchData(){
+  const res=await fetch(SHEET_URL);
+  const text=await res.text();
+  const rows=text.split("\n");
+
+  let data={};
+
+  for(let r of rows){
+    const cols=r.split(",");
+    if(cols.length<10) continue;
+
+    const date=cols[0];
+    const cls=cols[1];
+
+    if(cls!==classId) continue;
+
+    data[date]=cols.slice(2);
+  }
+
+  return data;
 }
 
-// ===== タイマー =====
-let t=0,ti;
-function updateTimer(){timer.textContent=String(Math.floor(t/60)).padStart(2,'0')+":"+String(t%60).padStart(2,'0');}
-function startTimer(){
-  if(ti) return;
-  ti=setInterval(()=>{
-    if(t<=0){
-      clearInterval(ti);
-      ti=null;
-      beep();
-      return;
+/* 表示 */
+function render(id,row){
+  let h="";
+  for(let i=0;i<6;i++){
+    h+=`<div class="row"><div>${i+1}時間目</div><div class="subject">${row[i]||""}</div></div>`;
+  }
+  document.getElementById(id).innerHTML=h;
+}
+
+/* メイン */
+async function load(){
+  const all=await fetchData();
+
+  today.innerHTML="";
+  tomorrow.innerHTML="";
+  todayPlan.textContent="";
+  tomorrowPlan.textContent="";
+  todayHeader.textContent="";
+  tomorrowHeader.textContent="";
+  todayType.textContent="";
+  tomorrowType.textContent="";
+
+  const t=new Date();
+  const key=t.toISOString().slice(0,10);
+
+  if(all[key]){
+    render("today",all[key]);
+    todayHeader.textContent=t.toLocaleDateString('ja-JP',{month:'numeric',day:'numeric',weekday:'short'});
+    todayType.textContent=all[key][6]||"";
+    todayPlan.textContent=all[key][7]||"";
+  }
+
+  let d=new Date();
+  for(let i=0;i<40;i++){
+    d.setDate(d.getDate()+1);
+    const k=d.toISOString().slice(0,10);
+
+    if(all[k]){
+      render("tomorrow",all[k]);
+      tomorrowHeader.textContent=d.toLocaleDateString('ja-JP',{month:'numeric',day:'numeric',weekday:'short'});
+      tomorrowType.textContent=all[k][6]||"";
+      tomorrowPlan.textContent=all[k][7]||"";
+      break;
     }
-    t--;updateTimer();
-  },1000);
+  }
 }
-function resetTimer(){clearInterval(ti);ti=null;t=0;updateTimer();}
-function addTime(s){t+=s;updateTimer();}
 
-// 音
+load();
+
+/* タイマー・ストップウォッチ・抽選はそのまま（省略せず入ってます） */
+let tmr=0,ti;
+function updateTimer(){timer.textContent=String(Math.floor(tmr/60)).padStart(2,'0')+":"+String(tmr%60).padStart(2,'0');}
+function startTimer(){if(ti)return;ti=setInterval(()=>{if(tmr<=0){clearInterval(ti);ti=null;beep();return;}tmr--;updateTimer();},1000);}
+function resetTimer(){clearInterval(ti);ti=null;tmr=0;updateTimer();}
+function addTime(s){tmr+=s;updateTimer();}
+
 let audioCtx;
 function beep(){
   if(!audioCtx) audioCtx=new AudioContext();
@@ -252,14 +296,12 @@ function beep(){
   p();
 }
 
-// ===== ストップウォッチ =====
 let swt=0,swi;
 function swUpdate(){sw.textContent=String(Math.floor(swt/600)).padStart(2,'0')+":"+String(Math.floor(swt/10)%60).padStart(2,'0')+"."+(swt%10);}
 function swStart(){if(swi)return;swi=setInterval(()=>{swt++;swUpdate();},100);}
 function swStop(){clearInterval(swi);swi=null;}
 function swReset(){swStop();swt=0;swUpdate();}
 
-// ===== 抽選 =====
 let maxNum=40;
 function changeMax(n){maxNum+=n;if(maxNum<1)maxNum=1;maxDisplay.textContent="最大："+maxNum;}
 function draw(){result.textContent=Math.floor(Math.random()*maxNum)+1;}
