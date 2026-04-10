@@ -10,6 +10,7 @@
 html,body{
   margin:0;
   height:100%;
+  overflow:hidden; /* ←はみ出し完全防止 */
 }
 
 body{
@@ -17,7 +18,7 @@ body{
   background:linear-gradient(135deg,#d9f3ff,#fff7d6);
 }
 
-/* ===== 全体を16:9に ===== */
+/* 全体 */
 .wrapper{
   height:100%;
   display:flex;
@@ -26,65 +27,61 @@ body{
 
 /* 上 */
 .top{
+  flex:0 0 18%;
   text-align:center;
 }
 
 .date{
-  font-size:1.8vw;
-  margin-top:1vh;
+  font-size:1.6vw;
 }
 
 .clock{
-  font-size:8vw;
-  font-weight:900;
+  font-size:7vw;
+  font-family:'Arial Black',sans-serif; /* ←数字専用 */
 }
 
 /* メイン */
 .main{
   flex:1;
   display:flex;
-  gap:1vw;
-  padding:1vw;
+  gap:0.5vw;
+  padding:0.5vw;
   box-sizing:border-box;
 }
 
 .left{
   flex:2;
   display:flex;
-  gap:1vw;
+  gap:0.5vw;
 }
 
 .card{
   flex:1;
   background:white;
-  border-radius:15px;
-  padding:1vw;
+  border-radius:12px;
+  padding:0.6vw;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
 }
 
 .header{
   text-align:center;
-  font-size:1.6vw;
-  margin-bottom:0.5vh;
+  font-size:1.4vw;
 }
 
 .row{
   display:grid;
   grid-template-columns:30% 70%;
-  font-size:1.8vw;
-  padding:4px 0;
-  align-items:center;
-}
-
-.subject{
-  padding-left:5px;
+  font-size:1.6vw;
+  padding:2px 0;
 }
 
 .plan{
-  font-size:1.5vw;
+  font-size:1.3vw;
   background:#fff3cd;
-  border-radius:8px;
-  padding:5px;
-  margin-top:5px;
+  border-radius:6px;
+  padding:3px;
 }
 
 /* 右 */
@@ -98,23 +95,23 @@ body{
 .tool{
   flex:1;
   background:white;
-  border-radius:15px;
-  padding:0.5vw;
+  border-radius:12px;
+  padding:0.4vw;
   text-align:center;
 }
 
 .big{
-  font-size:3.5vw;
-  font-weight:900;
+  font-size:3vw;
+  font-family:'Arial Black',sans-serif; /* ←数字太く */
 }
 
 /* ボタン */
 button{
-  font-size:0.9vw;
-  padding:3px 6px;
+  font-size:0.8vw;
+  padding:2px 5px;
   margin:1px;
   border:none;
-  border-radius:8px;
+  border-radius:6px;
   background:#6fa8dc;
   color:white;
 }
@@ -151,7 +148,6 @@ button{
 <div class="tool">
   <div class="big" id="timer">00:00</div>
   <button onclick="addTime(60)">+1分</button>
-  <button onclick="addTime(10)">+10秒</button>
   <button onclick="startTimer()">開始</button>
   <button onclick="resetTimer()">リセット</button>
 </div>
@@ -160,14 +156,10 @@ button{
   <div class="big" id="sw">00:00.0</div>
   <button onclick="swStart()">開始</button>
   <button onclick="swStop()">停止</button>
-  <button onclick="swReset()">リセット</button>
 </div>
 
 <div class="tool">
   <div class="big" id="result">-</div>
-  <div id="maxDisplay">40</div>
-  <button onclick="changeMax(-1)">-1</button>
-  <button onclick="changeMax(1)">+1</button>
   <button onclick="draw()">抽選</button>
 </div>
 
@@ -181,37 +173,34 @@ const SHEET_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6hu2HGH9XN1d3
 
 let cache=null;
 
-/* 時計（軽量） */
+/* 時計 */
 setInterval(()=>{
   const n=new Date();
   clock.textContent=n.toLocaleTimeString('ja-JP');
   date.textContent=n.toLocaleDateString('ja-JP',{year:'numeric',month:'numeric',day:'numeric',weekday:'short'});
 },1000);
 
-/* CSVキャッシュ */
+/* CSV */
 async function fetchData(){
   if(cache) return cache;
-
   const res=await fetch(SHEET_URL);
   const text=await res.text();
   const rows=text.split("\n");
-
   let data={};
-
   for(let r of rows){
     const c=r.split(",");
     if(c.length<10) continue;
-
-    const key=c[0];
-    data[key]=c.slice(2);
+    data[c[0]]=c.slice(2);
   }
-
   cache=data;
   return data;
 }
 
 function getKey(d){
-  return d.toISOString().slice(0,10);
+  const y=d.getFullYear();
+  const m=String(d.getMonth()+1).padStart(2,'0');
+  const day=String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
 }
 
 function render(id,row){
@@ -224,7 +213,6 @@ function render(id,row){
 
 async function load(){
   const all=await fetchData();
-
   const t=new Date();
   const key=getKey(t);
 
@@ -249,7 +237,7 @@ async function load(){
 
 load();
 
-/* タイマー（多重防止） */
+/* タイマー */
 let t=0,ti=null;
 function startTimer(){
   if(ti) return;
@@ -264,14 +252,8 @@ function addTime(s){t+=s;}
 
 /* SW */
 let swt=0,swi=null;
-function swStart(){if(swi)return;swi=setInterval(()=>{swt++;sw.textContent=swt/10;},100);}
+function swStart(){if(swi)return;swi=setInterval(()=>{swt++;sw.textContent=(swt/10).toFixed(1);},100);}
 function swStop(){clearInterval(swi);swi=null;}
-function swReset(){swStop();swt=0;sw.textContent="0";}
-
-/* 抽選 */
-let max=40;
-function changeMax(n){max+=n;if(max<1)max=1;maxDisplay.textContent=max;}
-function draw(){result.textContent=Math.floor(Math.random()*max)+1;}
 </script>
 
 </body>
