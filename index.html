@@ -14,15 +14,15 @@ body{
   overflow:hidden;
 }
 
-/* 上 */
+/* 上（時間だけ） */
 .top{
-  text-align:center;
-}
-.date{
-  font-size:4vh;
+  height:25vh; /* ← 1/4使用 */
+  display:flex;
+  justify-content:center;
+  align-items:center;
 }
 .clock{
-  font-size:14vh; /* ← 最大強調 */
+  font-size:20vh; /* ← 超巨大 */
   font-weight:700;
 }
 
@@ -39,56 +39,64 @@ select,button{
 /* メイン */
 .main{
   display:flex;
-  height:78vh;
+  height:75vh;
 }
 
-/* 日課 */
+/* 日課（幅を縮める） */
 .card{
-  flex:2;
+  flex:1.3; /* ← 小さく */
   margin:5px;
   background:white;
   border-radius:15px;
   padding:10px;
 }
+
 .header{
   font-size:3.5vh;
   text-align:center;
   font-weight:700;
 }
+
 .row{
   font-size:3.2vh;
   margin:6px 0;
 }
+
 .plan{
-  font-size:3vh; /* ← しっかり大きく */
+  font-size:3.2vh;
   background:#fff3cd;
   margin-top:10px;
   padding:5px;
 }
 
-/* 右 */
+/* 右（広げる） */
 .right{
-  flex:1;
+  flex:1.7; /* ← 広く */
   display:flex;
   flex-direction:column;
 }
 
+/* ツール */
 .tool{
   flex:1;
   background:white;
   margin:5px;
   border-radius:15px;
   text-align:center;
-  padding:5px;
+  padding:8px;
 }
 
-.big{font-size:5vh;}
+.big{
+  font-size:7vh; /* ← 大きく */
+  font-weight:700;
+}
 
 button{
-  margin:2px;
-  padding:5px;
+  margin:4px;
+  padding:8px 10px;
+  font-size:2vh;
   border:none;
-  border-radius:6px;
+  border-radius:8px;
   background:#6fa8dc;
   color:white;
 }
@@ -103,7 +111,6 @@ button{
 </div>
 
 <div class="top">
-<div id="date"></div>
 <div id="clock"></div>
 </div>
 
@@ -166,7 +173,6 @@ let current="3-1";
 setInterval(()=>{
 const d=new Date();
 clock.textContent=d.toLocaleTimeString();
-date.textContent=d.toLocaleDateString('ja-JP',{weekday:'short',month:'numeric',day:'numeric'});
 },1000);
 
 /* CSV */
@@ -181,7 +187,6 @@ rows.forEach(r=>{
 let c=r.split(",");
 if(c.length<10)return;
 if(c[1]!=current)return;
-
 data[c[0]]=c;
 });
 
@@ -192,7 +197,6 @@ function key(d){
 return d.toISOString().split("T")[0];
 }
 
-/* 表示 */
 function makeHeader(d,type){
 const w=["日","月","火","水","木","金","土"];
 return `${d.getMonth()+1}/${d.getDate()}(${w[d.getDay()]})　${type||""}`;
@@ -206,7 +210,6 @@ h+=`<div class="row">${i-1}時間目　${row[i]||""}</div>`;
 document.getElementById(id).innerHTML=h;
 }
 
-/* 読込 */
 async function load(){
 today.innerHTML="";
 tomorrow.innerHTML="";
@@ -224,7 +227,6 @@ todayH.textContent=makeHeader(t,data[k][8]);
 todayP.textContent=data[k][9]||"";
 }
 
-/* 明日 */
 let d=new Date();
 for(let i=0;i<7;i++){
 d.setDate(d.getDate()+1);
