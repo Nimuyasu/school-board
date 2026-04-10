@@ -4,95 +4,61 @@
 <meta charset="UTF-8">
 <title>教室表示</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@700&display=swap" rel="stylesheet">
 
 <style>
-html,body{
-  margin:0;
-  height:100%;
-  overflow:hidden;
-}
-
 body{
+  margin:0;
   font-family:'Noto Sans JP',sans-serif;
   background:linear-gradient(135deg,#d9f3ff,#fff7d6);
-}
-
-/* 左上 */
-#topLeft{
-  position:absolute;
-  left:15px;
-  top:10px;
-  display:flex;
-  gap:8px;
-}
-
-#classSelect{
-  font-size:2vh;
-}
-
-.iconBtn{
-  font-size:2vh;
+  overflow:hidden;
 }
 
 /* 上 */
 .top{
-  height:18%;
   text-align:center;
+  padding:10px;
 }
+.date{font-size:4vh;}
+.clock{font-size:12vh;font-weight:700;}
 
-.date{
-  font-size:3vh;
+/* クラス */
+#control{
+  position:absolute;
+  top:10px;
+  left:10px;
 }
-
-.clock{
-  font-size:10vh;
-  font-weight:700;
+select,button{
+  font-size:2.5vh;
 }
 
 /* メイン */
 .main{
-  height:82%;
   display:flex;
-  gap:0.5vw;
-  padding:0.5vw;
-  box-sizing:border-box;
+  height:75vh;
 }
 
-.left{
-  flex:2;
-  display:flex;
-  gap:0.5vw;
-}
-
+/* 日課 */
 .card{
-  flex:1;
+  flex:2;
+  margin:5px;
   background:white;
-  border-radius:12px;
-  padding:0.8vw;
-  display:flex;
-  flex-direction:column;
+  border-radius:15px;
+  padding:10px;
 }
-
 .header{
+  font-size:4vh;
   text-align:center;
-  font-size:3vh;
-  font-weight:700;
 }
-
 .row{
-  display:grid;
-  grid-template-columns:30% 70%;
-  font-size:3.2vh;
-  padding:4px 0;
+  display:flex;
+  font-size:4vh;
+  margin:6px 0;
 }
-
 .plan{
-  font-size:2.5vh;
+  font-size:3vh;
   background:#fff3cd;
-  border-radius:6px;
-  padding:4px;
-  margin-top:auto;
+  margin-top:10px;
 }
 
 /* 右 */
@@ -100,26 +66,22 @@ body{
   flex:1;
   display:flex;
   flex-direction:column;
-  gap:0.5vh;
 }
 
 .tool{
   flex:1;
   background:white;
-  border-radius:12px;
-  padding:0.5vw;
+  margin:5px;
+  border-radius:15px;
   text-align:center;
+  padding:5px;
 }
 
-.big{
-  font-size:5vh;
-  font-weight:700;
-}
+.big{font-size:6vh;}
 
 button{
-  font-size:1.6vh;
-  padding:3px 6px;
   margin:2px;
+  padding:5px;
   border:none;
   border-radius:6px;
   background:#6fa8dc;
@@ -130,179 +92,184 @@ button{
 
 <body>
 
-<div id="topLeft">
-  <select id="classSelect"></select>
-  <button class="iconBtn" onclick="reloadData()">⟳</button>
+<div id="control">
+<select id="cls"></select>
+<button onclick="reload()">更新</button>
 </div>
 
 <div class="top">
-  <div class="date" id="date"></div>
-  <div class="clock" id="clock"></div>
+<div id="date"></div>
+<div id="clock"></div>
 </div>
 
 <div class="main">
 
-<div class="left">
-  <div class="card">
-    <div class="header" id="todayHeader"></div>
-    <div id="today"></div>
-    <div class="plan" id="todayPlan"></div>
-  </div>
+<div class="card">
+<div class="header" id="todayH"></div>
+<div id="today"></div>
+<div class="plan" id="todayP"></div>
+</div>
 
-  <div class="card">
-    <div class="header" id="tomorrowHeader"></div>
-    <div id="tomorrow"></div>
-    <div class="plan" id="tomorrowPlan"></div>
-  </div>
+<div class="card">
+<div class="header" id="tomorrowH"></div>
+<div id="tomorrow"></div>
+<div class="plan" id="tomorrowP"></div>
 </div>
 
 <div class="right">
 
 <div class="tool">
-  <div class="big" id="timer">00:00</div>
-  <button onclick="addTime(60)">+1分</button>
-  <button onclick="startTimer()">開始</button>
-  <button onclick="resetTimer()">リセット</button>
+<div class="big" id="timer">00:00</div>
+<button onclick="add(-600)">-10</button>
+<button onclick="add(-60)">-1</button>
+<button onclick="add(60)">+1</button>
+<button onclick="add(600)">+10</button><br>
+<button onclick="startT()">開始</button>
+<button onclick="resetT()">リセット</button>
 </div>
 
 <div class="tool">
-  <div class="big" id="sw">00:00.0</div>
-  <button onclick="swStart()">開始</button>
-  <button onclick="swStop()">停止</button>
-  <button onclick="swReset()">リセット</button>
+<div class="big" id="sw">00:00.0</div>
+<button onclick="startSW()">開始</button>
+<button onclick="stopSW()">停止</button>
+<button onclick="resetSW()">リセット</button>
 </div>
 
 <div class="tool">
-  <div class="big" id="result">-</div>
-  <div id="maxDisplay">40</div>
-  <button onclick="changeMax(-1)">-1</button>
-  <button onclick="changeMax(1)">+1</button>
-  <button onclick="draw()">抽選</button>
-  <button onclick="resetDraw()">リセット</button>
+<div class="big" id="res">-</div>
+<div id="max">40</div>
+<button onclick="chg(-10)">-10</button>
+<button onclick="chg(-1)">-1</button>
+<button onclick="chg(1)">+1</button>
+<button onclick="chg(10)">+10</button><br>
+<button onclick="draw()">抽選</button>
+<button onclick="resetR()">リセット</button>
 </div>
 
 </div>
 </div>
 
 <script>
-const SHEET_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6hu2HGH9XN1d3Pj8euPrv49TgqM-GsPJNqge6IiRoqvXpNWuRFteTEufF-ffT5WDpYtG4W25h4bxI/pub?gid=0&single=true&output=csv";
+const URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6hu2HGH9XN1d3Pj8euPrv49TgqM-GsPJNqge6IiRoqvXpNWuRFteTEufF-ffT5WDpYtG4W25h4bxI/pub?gid=0&single=true&output=csv";
 
-const classList=["1-1","1-2","1-3","1-4","2-1","2-2","2-3","2-4","3-1","3-2","3-3","3-4"];
+const list=["1-1","1-2","1-3","1-4","2-1","2-2","2-3","2-4","3-1","3-2","3-3","3-4"];
+list.forEach(c=>cls.innerHTML+=`<option>${c}</option>`);
 
-let classId="3-1";
-let cache=null;
-
-classList.forEach(c=>{
-  classSelect.innerHTML+=`<option value="${c}">${c}</option>`;
-});
-
-/* クラス切替 */
-function reloadData(){
-  classId=classSelect.value;
-  load();
-}
+let current="3-1";
 
 /* 時計 */
 setInterval(()=>{
-  const n=new Date();
-  clock.textContent=n.toLocaleTimeString('ja-JP');
-  date.textContent=n.toLocaleDateString('ja-JP',{year:'numeric',month:'numeric',day:'numeric',weekday:'short'});
+const d=new Date();
+clock.textContent=d.toLocaleTimeString();
+date.textContent=d.toLocaleDateString('ja-JP',{weekday:'short',month:'numeric',day:'numeric'});
 },1000);
 
 /* CSV */
-async function fetchData(){
-  if(cache) return cache;
-  const res=await fetch(SHEET_URL);
-  const text=await res.text();
-  const rows=text.split("\n");
+async function get(){
+const t=await fetch(URL);
+const tx=await t.text();
+const rows=tx.split("\n");
 
-  let data={};
+let data={};
 
-  for(let r of rows){
-    const c=r.split(",");
-    if(c.length<10) continue;
+rows.forEach(r=>{
+let c=r.split(",");
+if(c.length<10)return;
+if(c[1]!=current)return;
 
-    if(c[1]!==classId) continue;
+data[c[0]]=c;
+});
 
-    data[c[0]]=c.slice(2);
-  }
-
-  cache=data;
-  return data;
+return data;
 }
 
-/* 日付 */
-function getKey(d){
-  const y=d.getFullYear();
-  const m=String(d.getMonth()+1).padStart(2,'0');
-  const day=String(d.getDate()).padStart(2,'0');
-  return `${y}-${m}-${day}`;
+function key(d){
+return d.toISOString().split("T")[0];
 }
 
 /* 表示 */
-function render(id,row){
-  let h="";
-  for(let i=0;i<6;i++){
-    h+=`<div class="row"><div>${i+1}時間目</div><div>${row[i]||""}</div></div>`;
-  }
-  document.getElementById(id).innerHTML=h;
+function drawTable(id,row){
+let h="";
+for(let i=2;i<=7;i++){
+h+=`<div class="row">${i-1}時間目　${row[i]||""}</div>`;
+}
+document.getElementById(id).innerHTML=h;
 }
 
+/* 読込 */
 async function load(){
-  cache=null; // ← クラス変更で再取得
-  const all=await fetchData();
+today.innerHTML="";
+tomorrow.innerHTML="";
+todayP.textContent="";
+tomorrowP.textContent="";
 
-  today.innerHTML="";
-  tomorrow.innerHTML="";
+const data=await get();
 
-  const t=new Date();
-  const key=getKey(t);
+const t=new Date();
+const k=key(t);
 
-  if(all[key]){
-    render("today",all[key]);
-    todayHeader.textContent=t.toLocaleDateString('ja-JP',{month:'numeric',day:'numeric',weekday:'short'});
-    todayPlan.textContent=all[key][7]||"";
-  }
+if(data[k]){
+drawTable("today",data[k]);
+todayH.textContent=k;
+todayP.textContent=data[k][8]||"";
+}
 
-  let d=new Date();
-  for(let i=0;i<30;i++){
-    d.setDate(d.getDate()+1);
-    const k=getKey(d);
-    if(all[k]){
-      render("tomorrow",all[k]);
-      tomorrowHeader.textContent=d.toLocaleDateString('ja-JP',{month:'numeric',day:'numeric',weekday:'short'});
-      tomorrowPlan.textContent=all[k][7]||"";
-      break;
-    }
-  }
+/* 明日（平日のみ） */
+let d=new Date();
+for(let i=0;i<7;i++){
+d.setDate(d.getDate()+1);
+if(d.getDay()==0||d.getDay()==6)continue;
+
+const kk=key(d);
+if(data[kk]){
+drawTable("tomorrow",data[kk]);
+tomorrowH.textContent=kk;
+tomorrowP.textContent=data[kk][8]||"";
+break;
+}
+}
+}
+
+function reload(){
+current=cls.value;
+load();
 }
 
 load();
 
 /* タイマー */
-let t=0,ti=null;
-function startTimer(){
-  if(ti) return;
-  ti=setInterval(()=>{
-    if(t<=0){clearInterval(ti);ti=null;return;}
-    t--;
-    timer.textContent=Math.floor(t/60)+":"+String(t%60).padStart(2,'0');
-  },1000);
+let t=0,ti;
+function add(s){t+=s;if(t<0)t=0;timer.textContent=format(t);}
+function startT(){
+if(ti)return;
+ti=setInterval(()=>{
+if(t<=0){clearInterval(ti);ti=null;return;}
+t--;timer.textContent=format(t);
+},1000);
 }
-function resetTimer(){clearInterval(ti);ti=null;t=0;timer.textContent="00:00";}
-function addTime(s){t+=s;}
+function resetT(){clearInterval(ti);ti=null;t=0;timer.textContent="00:00";}
+function format(s){return Math.floor(s/60)+":"+String(s%60).padStart(2,'0');}
 
 /* SW */
-let swt=0,swi=null;
-function swStart(){if(swi)return;swi=setInterval(()=>{swt++;sw.textContent=(swt/10).toFixed(1);},100);}
-function swStop(){clearInterval(swi);swi=null;}
-function swReset(){swStop();swt=0;sw.textContent="00:00.0";}
+let swt=0,swi;
+function startSW(){
+if(swi)return;
+swi=setInterval(()=>{
+swt++;
+let m=Math.floor(swt/600);
+let s=Math.floor((swt%600)/10);
+let ms=swt%10;
+sw.textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}.${ms}`;
+},100);
+}
+function stopSW(){clearInterval(swi);swi=null;}
+function resetSW(){stopSW();swt=0;sw.textContent="00:00.0";}
 
 /* 抽選 */
-let max=40;
-function changeMax(n){max+=n;if(max<1)max=1;maxDisplay.textContent=max;}
-function draw(){result.textContent=Math.floor(Math.random()*max)+1;}
-function resetDraw(){result.textContent="-";}
+let maxN=40;
+function chg(n){maxN+=n;if(maxN<1)maxN=1;max.textContent=maxN;}
+function draw(){res.textContent=Math.floor(Math.random()*maxN)+1;}
+function resetR(){res.textContent="-";}
 </script>
 
 </body>
