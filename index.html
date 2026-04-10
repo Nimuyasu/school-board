@@ -7,109 +7,115 @@
 <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap" rel="stylesheet">
 
 <style>
-html,body{margin:0;height:100%;}
+html,body{
+  margin:0;
+  height:100%;
+}
+
 body{
   font-family:'Kosugi Maru',sans-serif;
   background:linear-gradient(135deg,#d9f3ff,#fff7d6);
-  background-attachment:fixed;
 }
 
-/* 左上 */
-#topLeft{
-  position:absolute;
-  left:20px;
-  top:10px;
+/* ===== 全体を16:9に ===== */
+.wrapper{
+  height:100%;
   display:flex;
-  gap:8px;
-}
-
-#classSelect{
-  font-size:2vw;
-  border:none;
-  background:transparent;
-}
-
-.iconBtn{
-  width:34px;height:34px;border:none;border-radius:50%;
-  background:#6fa8dc;color:white;font-size:18px;cursor:pointer;
+  flex-direction:column;
 }
 
 /* 上 */
-.top{text-align:center;}
-.date{font-size:2.2vw;padding-top:15px;}
-.clock{font-size:11vw;font-weight:900;}
-
-/* レイアウト */
-.main{
-  display:flex;
-  min-height:78vh;
-  gap:1vw;
-  padding:1vw;
+.top{
+  text-align:center;
 }
 
-.left{flex:2;display:flex;gap:1vw;}
+.date{
+  font-size:1.8vw;
+  margin-top:1vh;
+}
+
+.clock{
+  font-size:8vw;
+  font-weight:900;
+}
+
+/* メイン */
+.main{
+  flex:1;
+  display:flex;
+  gap:1vw;
+  padding:1vw;
+  box-sizing:border-box;
+}
+
+.left{
+  flex:2;
+  display:flex;
+  gap:1vw;
+}
 
 .card{
   flex:1;
   background:white;
-  border-radius:20px;
-  padding:1.2vw;
+  border-radius:15px;
+  padding:1vw;
 }
 
 .header{
-  display:flex;
-  justify-content:center;
-  gap:10px;
-  font-size:2vw;
+  text-align:center;
+  font-size:1.6vw;
+  margin-bottom:0.5vh;
 }
 
 .row{
   display:grid;
   grid-template-columns:30% 70%;
-  font-size:2.6vw;
+  font-size:1.8vw;
+  padding:4px 0;
   align-items:center;
-  padding:8px 0;
-  min-height:2.8vw;
 }
 
-.row div:first-child{font-size:1.5vw;}
-.subject{min-height:2.8vw;}
+.subject{
+  padding-left:5px;
+}
 
 .plan{
-  font-size:2.2vw;
+  font-size:1.5vw;
   background:#fff3cd;
-  border-radius:10px;
-  padding:6px;
-  margin-top:8px;
+  border-radius:8px;
+  padding:5px;
+  margin-top:5px;
 }
 
+/* 右 */
 .right{
   flex:1;
   display:flex;
   flex-direction:column;
-  gap:1vh;
+  gap:0.5vh;
 }
 
 .tool{
   flex:1;
   background:white;
-  border-radius:20px;
-  padding:0.7vw;
+  border-radius:15px;
+  padding:0.5vw;
   text-align:center;
 }
 
 .big{
-  font-size:5vw;
+  font-size:3.5vw;
   font-weight:900;
 }
 
+/* ボタン */
 button{
+  font-size:0.9vw;
+  padding:3px 6px;
+  margin:1px;
   border:none;
-  border-radius:12px;
-  padding:4px 8px;
-  margin:2px;
-  font-size:1vw;
-  background:linear-gradient(135deg,#74ebd5,#9face6);
+  border-radius:8px;
+  background:#6fa8dc;
   color:white;
 }
 </style>
@@ -117,10 +123,7 @@ button{
 
 <body>
 
-<div id="topLeft">
-  <select id="classSelect"></select>
-  <button class="iconBtn" onclick="reloadData()">⟳</button>
-</div>
+<div class="wrapper">
 
 <div class="top">
   <div class="date" id="date"></div>
@@ -131,19 +134,13 @@ button{
 
 <div class="left">
   <div class="card">
-    <div class="header">
-      <span id="todayHeader"></span>
-      <span id="todayType"></span>
-    </div>
+    <div class="header" id="todayHeader"></div>
     <div id="today"></div>
     <div class="plan" id="todayPlan"></div>
   </div>
 
   <div class="card">
-    <div class="header">
-      <span id="tomorrowHeader"></span>
-      <span id="tomorrowType"></span>
-    </div>
+    <div class="header" id="tomorrowHeader"></div>
     <div id="tomorrow"></div>
     <div class="plan" id="tomorrowPlan"></div>
   </div>
@@ -153,10 +150,8 @@ button{
 
 <div class="tool">
   <div class="big" id="timer">00:00</div>
-  <button onclick="addTime(600)">+10分</button>
   <button onclick="addTime(60)">+1分</button>
   <button onclick="addTime(10)">+10秒</button>
-  <button onclick="addTime(1)">+1秒</button><br>
   <button onclick="startTimer()">開始</button>
   <button onclick="resetTimer()">リセット</button>
 </div>
@@ -170,13 +165,12 @@ button{
 
 <div class="tool">
   <div class="big" id="result">-</div>
-  <div id="maxDisplay">最大：40</div>
-  <button onclick="changeMax(-10)">-10</button>
+  <div id="maxDisplay">40</div>
   <button onclick="changeMax(-1)">-1</button>
   <button onclick="changeMax(1)">+1</button>
-  <button onclick="changeMax(10)">+10</button><br>
   <button onclick="draw()">抽選</button>
-  <button onclick="resetDraw()">リセット</button>
+</div>
+
 </div>
 
 </div>
@@ -185,37 +179,19 @@ button{
 <script>
 const SHEET_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6hu2HGH9XN1d3Pj8euPrv49TgqM-GsPJNqge6IiRoqvXpNWuRFteTEufF-ffT5WDpYtG4W25h4bxI/pub?gid=0&single=true&output=csv";
 
-const classList=["1-1","1-2","1-3","1-4","2-1","2-2","2-3","2-4","3-1","3-2","3-3","3-4","s-1","s-2","s-3","a-1","a-2","a-3"];
+let cache=null;
 
-let classId="3-1";
-
-classList.forEach(c=>{
-  classSelect.innerHTML+=`<option value="${c}">${c}</option>`;
-});
-
-function reloadData(){
-  classId=classSelect.value;
-  load();
-}
-
-/* 時計 */
+/* 時計（軽量） */
 setInterval(()=>{
   const n=new Date();
   clock.textContent=n.toLocaleTimeString('ja-JP');
-  date.textContent=n.getFullYear()+"年"+(n.getMonth()+1)+"月"+n.getDate()+"日（"+
-  ["日","月","火","水","木","金","土"][n.getDay()]+"）";
+  date.textContent=n.toLocaleDateString('ja-JP',{year:'numeric',month:'numeric',day:'numeric',weekday:'short'});
 },1000);
 
-/* 日本時間キー */
-function getLocalDateKey(d){
-  const y=d.getFullYear();
-  const m=String(d.getMonth()+1).padStart(2,'0');
-  const day=String(d.getDate()).padStart(2,'0');
-  return `${y}-${m}-${day}`;
-}
-
-/* CSV取得 */
+/* CSVキャッシュ */
 async function fetchData(){
+  if(cache) return cache;
+
   const res=await fetch(SHEET_URL);
   const text=await res.text();
   const rows=text.split("\n");
@@ -223,62 +199,49 @@ async function fetchData(){
   let data={};
 
   for(let r of rows){
-    const cols=r.split(",");
-    if(cols.length<10) continue;
+    const c=r.split(",");
+    if(c.length<10) continue;
 
-    const date=cols[0];
-    const cls=cols[1];
-
-    if(cls!==classId) continue;
-
-    data[date]=cols.slice(2);
+    const key=c[0];
+    data[key]=c.slice(2);
   }
 
+  cache=data;
   return data;
 }
 
-/* 表示 */
+function getKey(d){
+  return d.toISOString().slice(0,10);
+}
+
 function render(id,row){
   let h="";
   for(let i=0;i<6;i++){
-    h+=`<div class="row"><div>${i+1}時間目</div><div class="subject">${row[i]||""}</div></div>`;
+    h+=`<div class="row"><div>${i+1}</div><div>${row[i]||""}</div></div>`;
   }
   document.getElementById(id).innerHTML=h;
 }
 
-/* メイン */
 async function load(){
   const all=await fetchData();
 
-  today.innerHTML="";
-  tomorrow.innerHTML="";
-  todayPlan.textContent="";
-  tomorrowPlan.textContent="";
-  todayHeader.textContent="";
-  tomorrowHeader.textContent="";
-  todayType.textContent="";
-  tomorrowType.textContent="";
+  const t=new Date();
+  const key=getKey(t);
 
-  const todayDate=new Date();
-  const todayKey=getLocalDateKey(todayDate);
-
-  if(all[todayKey]){
-    render("today",all[todayKey]);
-    todayHeader.textContent=todayDate.toLocaleDateString('ja-JP',{month:'numeric',day:'numeric',weekday:'short'});
-    todayType.textContent=all[todayKey][6]||"";
-    todayPlan.textContent=all[todayKey][7]||"";
+  if(all[key]){
+    render("today",all[key]);
+    todayHeader.textContent=t.toLocaleDateString('ja-JP',{month:'numeric',day:'numeric',weekday:'short'});
+    todayPlan.textContent=all[key][7]||"";
   }
 
   let d=new Date();
-  for(let i=0;i<40;i++){
+  for(let i=0;i<30;i++){
     d.setDate(d.getDate()+1);
-    const key=getLocalDateKey(d);
-
-    if(all[key] && all[key].some(v=>v)){
-      render("tomorrow",all[key]);
+    const k=getKey(d);
+    if(all[k]){
+      render("tomorrow",all[k]);
       tomorrowHeader.textContent=d.toLocaleDateString('ja-JP',{month:'numeric',day:'numeric',weekday:'short'});
-      tomorrowType.textContent=all[key][6]||"";
-      tomorrowPlan.textContent=all[key][7]||"";
+      tomorrowPlan.textContent=all[k][7]||"";
       break;
     }
   }
@@ -286,41 +249,29 @@ async function load(){
 
 load();
 
-/* タイマー */
-let t=0,ti;
-function updateTimer(){timer.textContent=String(Math.floor(t/60)).padStart(2,'0')+":"+String(t%60).padStart(2,'0');}
-function startTimer(){if(ti)return;ti=setInterval(()=>{if(t<=0){clearInterval(ti);ti=null;beep();return;}t--;updateTimer();},1000);}
-function resetTimer(){clearInterval(ti);ti=null;t=0;updateTimer();}
-function addTime(s){t+=s;updateTimer();}
-
-/* 音 */
-let audioCtx;
-function beep(){
-  if(!audioCtx) audioCtx=new AudioContext();
-  let c=0;
-  const p=()=>{
-    const o=audioCtx.createOscillator();
-    o.frequency.value=2000;
-    o.connect(audioCtx.destination);
-    o.start();
-    setTimeout(()=>o.stop(),80);
-    if(++c<24)setTimeout(p,120);
-  };
-  p();
+/* タイマー（多重防止） */
+let t=0,ti=null;
+function startTimer(){
+  if(ti) return;
+  ti=setInterval(()=>{
+    if(t<=0){clearInterval(ti);ti=null;return;}
+    t--;
+    timer.textContent=Math.floor(t/60)+":"+String(t%60).padStart(2,'0');
+  },1000);
 }
+function resetTimer(){clearInterval(ti);ti=null;t=0;timer.textContent="00:00";}
+function addTime(s){t+=s;}
 
-/* ストップウォッチ */
-let swt=0,swi;
-function swUpdate(){sw.textContent=String(Math.floor(swt/600)).padStart(2,'0')+":"+String(Math.floor(swt/10)%60).padStart(2,'0')+"."+(swt%10);}
-function swStart(){if(swi)return;swi=setInterval(()=>{swt++;swUpdate();},100);}
+/* SW */
+let swt=0,swi=null;
+function swStart(){if(swi)return;swi=setInterval(()=>{swt++;sw.textContent=swt/10;},100);}
 function swStop(){clearInterval(swi);swi=null;}
-function swReset(){swStop();swt=0;swUpdate();}
+function swReset(){swStop();swt=0;sw.textContent="0";}
 
 /* 抽選 */
-let maxNum=40;
-function changeMax(n){maxNum+=n;if(maxNum<1)maxNum=1;maxDisplay.textContent="最大："+maxNum;}
-function draw(){result.textContent=Math.floor(Math.random()*maxNum)+1;}
-function resetDraw(){result.textContent="-";}
+let max=40;
+function changeMax(n){max+=n;if(max<1)max=1;maxDisplay.textContent=max;}
+function draw(){result.textContent=Math.floor(Math.random()*max)+1;}
 </script>
 
 </body>
