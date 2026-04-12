@@ -14,60 +14,71 @@ body{
   overflow:hidden;
 }
 
-/* 時間 */
+/* 時刻 */
 .top{
-  height:25vh;
+  height:25%;
   display:flex;
   justify-content:center;
   align-items:center;
 }
 .clock{
-  font-size:22vh; /* ← 最大化 */
+  font-size:9vw; /* ← vhやめた */
   font-weight:700;
-  line-height:1;
 }
 
 /* 左上 */
 #control{
   position:absolute;
-  top:8px;
+  top:10px;
   left:10px;
-}
-select,button{
-  font-size:1.8vh;
 }
 
 /* メイン */
 .main{
   display:flex;
-  height:75vh;
+  height:75%;
 }
 
 /* 日課 */
 .card{
   flex:1.3;
-  margin:4px;
+  margin:5px;
   background:white;
-  border-radius:12px;
-  padding:8px;
+  border-radius:15px;
+  padding:10px;
 }
 
 .header{
-  font-size:3.2vh;
+  font-size:2.5vw;
   text-align:center;
   font-weight:700;
 }
 
+/* 行 */
 .row{
-  font-size:3vh;
-  margin:4px 0;
+  display:flex;
+  align-items:center;
+  margin:6px 0;
 }
 
+/* 時間目 */
+.period{
+  width:5em; /* ← 固定幅 */
+  font-size:1.8vw;
+}
+
+/* 教科 */
+.subject{
+  flex:1;
+  font-size:2.8vw; /* ← 大きく */
+}
+
+/* 予定 */
 .plan{
-  font-size:2.8vh;
+  font-size:2.3vw;
   background:#fff3cd;
-  margin-top:6px;
-  padding:4px;
+  margin-top:8px;
+  padding:6px;
 }
 
 /* 右 */
@@ -75,40 +86,42 @@ select,button{
   flex:1.7;
   display:flex;
   flex-direction:column;
-  gap:2px; /* ← 圧縮 */
 }
 
 .tool{
   flex:1;
   background:white;
-  margin:2px;
+  margin:3px;
   border-radius:12px;
   text-align:center;
-  padding:4px;
+  padding:5px;
 }
 
 .big{
-  font-size:6vh;
+  font-size:4vw;
   font-weight:700;
 }
 
 /* ボタン */
 button{
-  margin:1px;
+  margin:2px;
   padding:4px 6px;
-  font-size:1.6vh;
+  font-size:1.2vw;
   border:none;
   border-radius:6px;
   background:#6fa8dc;
   color:white;
 }
 
-/* 抽選上部 */
+/* 抽選 */
 .drawTop{
   display:flex;
   justify-content:center;
-  align-items:center;
-  gap:8px;
+  align-items:baseline;
+  gap:5px;
+}
+.max{
+  font-size:2vw;
 }
 </style>
 </head>
@@ -140,7 +153,6 @@ button{
 
 <div class="right">
 
-<!-- タイマー -->
 <div class="tool">
 <div class="big" id="timer">00:00</div>
 <button onclick="add(600)">＋10分</button>
@@ -151,7 +163,6 @@ button{
 <button onclick="resetT()">リセット</button>
 </div>
 
-<!-- SW -->
 <div class="tool">
 <div class="big" id="sw">00:00.0</div>
 <button onclick="startSW()">開始</button>
@@ -159,11 +170,10 @@ button{
 <button onclick="resetSW()">リセット</button>
 </div>
 
-<!-- 抽選 -->
 <div class="tool">
 <div class="drawTop">
   <div class="big" id="res">-</div>
-  <div id="max">40</div>
+  <div class="max">/ <span id="max">40</span></div>
 </div>
 
 <button onclick="chg(-10)">-10</button>
@@ -219,19 +229,17 @@ return `${d.getMonth()+1}/${d.getDate()}(${w[d.getDay()]})　${type||""}`;
 function drawTable(id,row){
 let h="";
 for(let i=2;i<=7;i++){
-h+=`<div class="row">${i-1}時間目　${row[i]||""}</div>`;
+h+=`
+<div class="row">
+  <div class="period">${i-1}時間目</div>
+  <div class="subject">${row[i]||""}</div>
+</div>`;
 }
 document.getElementById(id).innerHTML=h;
 }
 
 async function load(){
-today.innerHTML="";
-tomorrow.innerHTML="";
-todayP.textContent="";
-tomorrowP.textContent="";
-
 const data=await get();
-
 const t=new Date();
 const k=key(t);
 
