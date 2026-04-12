@@ -14,7 +14,7 @@ body{
   overflow:hidden;
 }
 
-/* 上部（時計） */
+/* 時計 */
 .top{
   height:22vh;
   display:flex;
@@ -22,7 +22,7 @@ body{
   justify-content:center;
 }
 #clock{
-  font-size:12vh;
+  font-size:18vh; /* ← 1.5倍 */
   font-weight:700;
 }
 
@@ -237,6 +237,12 @@ document.getElementById(id).innerHTML=h;
 
 async function load(){
 const data=await get();
+
+today.innerHTML="";
+tomorrow.innerHTML="";
+todayP.textContent="";
+tomorrowP.textContent="";
+
 const t=new Date();
 const k=key(t);
 
@@ -244,6 +250,20 @@ if(data[k]){
 drawTable("today",data[k]);
 todayH.textContent=makeHeader(t,data[k][8]);
 todayP.textContent=data[k][9]||"";
+}
+
+let d=new Date();
+for(let i=0;i<7;i++){
+d.setDate(d.getDate()+1);
+if(d.getDay()==0||d.getDay()==6)continue;
+
+const kk=key(d);
+if(data[kk]){
+drawTable("tomorrow",data[kk]);
+tomorrowH.textContent=makeHeader(d,data[kk][8]);
+tomorrowP.textContent=data[kk][9]||"";
+break;
+}
 }
 }
 
@@ -254,7 +274,7 @@ load();
 
 load();
 
-/* 🔔 音（指定どおり） */
+/* 音 */
 const ctx=new (window.AudioContext||window.webkitAudioContext)();
 
 function beep(){
@@ -269,14 +289,19 @@ g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.1);
 o.stop(ctx.currentTime+0.1);
 }
 
-function alarm(){
-let count=0;
-let interval=setInterval(()=>{
+function playSet(){
 for(let i=0;i<4;i++){
-setTimeout(beep,i*120); // ピピピピ（高速）
+setTimeout(beep,i*120);
 }
+}
+
+function alarm(){
+playSet(); // 即鳴る
+let count=1;
+let int=setInterval(()=>{
+playSet();
 count++;
-if(count>=4) clearInterval(interval); // 4回
+if(count>=4) clearInterval(int);
 },1000);
 }
 
@@ -299,7 +324,12 @@ t--;
 timer.textContent=format(t);
 },1000);
 }
-function resetT(){clearInterval(ti);ti=null;t=0;timer.textContent="00:00";}
+function resetT(){
+clearInterval(ti);
+ti=null;
+t=0;
+timer.textContent="00:00";
+}
 
 /* SW */
 let swt=0,swi;
