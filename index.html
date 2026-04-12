@@ -14,26 +14,27 @@ body{
   overflow:hidden;
 }
 
-/* 上（時間だけ） */
+/* 時間 */
 .top{
-  height:25vh; /* ← 1/4使用 */
+  height:25vh;
   display:flex;
   justify-content:center;
   align-items:center;
 }
 .clock{
-  font-size:20vh; /* ← 超巨大 */
+  font-size:22vh; /* ← 最大化 */
   font-weight:700;
+  line-height:1;
 }
 
-/* クラス */
+/* 左上 */
 #control{
   position:absolute;
-  top:10px;
+  top:8px;
   left:10px;
 }
 select,button{
-  font-size:2vh;
+  font-size:1.8vh;
 }
 
 /* メイン */
@@ -42,63 +43,72 @@ select,button{
   height:75vh;
 }
 
-/* 日課（幅を縮める） */
+/* 日課 */
 .card{
-  flex:1.3; /* ← 小さく */
-  margin:5px;
+  flex:1.3;
+  margin:4px;
   background:white;
-  border-radius:15px;
-  padding:10px;
+  border-radius:12px;
+  padding:8px;
 }
 
 .header{
-  font-size:3.5vh;
+  font-size:3.2vh;
   text-align:center;
   font-weight:700;
 }
 
 .row{
-  font-size:3.2vh;
-  margin:6px 0;
+  font-size:3vh;
+  margin:4px 0;
 }
 
 .plan{
-  font-size:3.2vh;
+  font-size:2.8vh;
   background:#fff3cd;
-  margin-top:10px;
-  padding:5px;
+  margin-top:6px;
+  padding:4px;
 }
 
-/* 右（広げる） */
+/* 右 */
 .right{
-  flex:1.7; /* ← 広く */
+  flex:1.7;
   display:flex;
   flex-direction:column;
+  gap:2px; /* ← 圧縮 */
 }
 
-/* ツール */
 .tool{
   flex:1;
   background:white;
-  margin:5px;
-  border-radius:15px;
+  margin:2px;
+  border-radius:12px;
   text-align:center;
-  padding:8px;
+  padding:4px;
 }
 
 .big{
-  font-size:7vh; /* ← 大きく */
+  font-size:6vh;
   font-weight:700;
 }
 
+/* ボタン */
 button{
-  margin:4px;
-  padding:8px 10px;
-  font-size:2vh;
+  margin:1px;
+  padding:4px 6px;
+  font-size:1.6vh;
   border:none;
-  border-radius:8px;
+  border-radius:6px;
   background:#6fa8dc;
   color:white;
+}
+
+/* 抽選上部 */
+.drawTop{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:8px;
 }
 </style>
 </head>
@@ -107,7 +117,7 @@ button{
 
 <div id="control">
 <select id="cls"></select>
-<button onclick="reload()">更新</button>
+<button onclick="reload()">⟳</button>
 </div>
 
 <div class="top">
@@ -130,6 +140,7 @@ button{
 
 <div class="right">
 
+<!-- タイマー -->
 <div class="tool">
 <div class="big" id="timer">00:00</div>
 <button onclick="add(600)">＋10分</button>
@@ -140,6 +151,7 @@ button{
 <button onclick="resetT()">リセット</button>
 </div>
 
+<!-- SW -->
 <div class="tool">
 <div class="big" id="sw">00:00.0</div>
 <button onclick="startSW()">開始</button>
@@ -147,13 +159,18 @@ button{
 <button onclick="resetSW()">リセット</button>
 </div>
 
+<!-- 抽選 -->
 <div class="tool">
-<div class="big" id="res">-</div>
-<div id="max">40</div>
+<div class="drawTop">
+  <div class="big" id="res">-</div>
+  <div id="max">40</div>
+</div>
+
 <button onclick="chg(-10)">-10</button>
 <button onclick="chg(-1)">-1</button>
 <button onclick="chg(1)">+1</button>
 <button onclick="chg(10)">+10</button><br>
+
 <button onclick="draw()">抽選</button>
 <button onclick="resetR()">リセット</button>
 </div>
@@ -171,8 +188,7 @@ let current="3-1";
 
 /* 時計 */
 setInterval(()=>{
-const d=new Date();
-clock.textContent=d.toLocaleTimeString();
+clock.textContent=new Date().toLocaleTimeString();
 },1000);
 
 /* CSV */
@@ -182,14 +198,12 @@ const tx=await t.text();
 const rows=tx.split("\n");
 
 let data={};
-
 rows.forEach(r=>{
 let c=r.split(",");
 if(c.length<10)return;
 if(c[1]!=current)return;
 data[c[0]]=c;
 });
-
 return data;
 }
 
@@ -251,6 +265,9 @@ load();
 
 /* タイマー */
 let t=0,ti;
+function format(s){
+return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+}
 function add(s){t+=s;if(t<0)t=0;timer.textContent=format(t);}
 function startT(){
 if(ti)return;
@@ -260,7 +277,6 @@ t--;timer.textContent=format(t);
 },1000);
 }
 function resetT(){clearInterval(ti);ti=null;t=0;timer.textContent="00:00";}
-function format(s){return Math.floor(s/60)+":"+String(s%60).padStart(2,'0');}
 
 /* SW */
 let swt=0,swi;
