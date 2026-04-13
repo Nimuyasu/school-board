@@ -5,140 +5,133 @@
 <title>教室表示</title>
 
 <style>
-body {
-  margin: 0;
-  font-family: sans-serif;
-  background: linear-gradient(135deg,#cfe8ff,#fff3c8);
+body{
+  margin:0;
+  font-family:sans-serif;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  background:linear-gradient(135deg,#cfe8ff,#fff3c9);
 }
 
 /* 上部 */
-.top {
-  display: flex;
-  align-items: center;
-  padding: 10px 20px;
+.top{
+  display:flex;
+  align-items:center;
+  padding:10px 20px;
 }
 
-select {
-  font-size: 28px;
+select{
+  font-size:28px;
+  padding:5px 10px;
 }
 
-button {
-  background:#6ea0d6;
-  color:white;
-  border:none;
-  padding:8px 14px;
+button{
   margin-left:10px;
-  border-radius:8px;
-  font-size:18px;
+  font-size:20px;
+  padding:6px 10px;
+  border:none;
+  border-radius:6px;
+  background:#6fa8dc;
+  color:white;
   cursor:pointer;
 }
 
 /* 時計 */
-.clock {
+.clock{
   text-align:center;
-  font-size:120px;
+  font-size:180px;
   font-weight:bold;
+  line-height:1;
 }
 
-/* 全体レイアウト */
-.main {
-  display:flex;
-  gap:20px;
+/* メイン */
+.main{
+  flex:1;
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:15px;
   padding:10px 20px 20px;
-  height:calc(100vh - 160px);
-  box-sizing:border-box;
 }
 
 /* 日課 */
-.schedule {
-  flex:1;
+.card{
   background:white;
   border-radius:15px;
   padding:15px;
   display:flex;
   flex-direction:column;
+  justify-content:space-between;
 }
 
-.date {
+.date{
   font-size:32px;
   font-weight:bold;
+  text-align:center;
   margin-bottom:10px;
 }
 
-.row {
+.row{
   display:flex;
   align-items:center;
   margin:6px 0;
 }
 
-.period {
-  width:120px;
+.period{
+  width:90px;
   font-size:22px;
 }
 
-.subject {
-  font-size:30px;
-  margin-left:10px;
+.subject{
+  flex:1;
+  font-size:32px;
+  text-align:left;
 }
 
-.plan {
-  margin-top:auto;
-  background:#f5e6c0;
+.plan{
+  background:#f3e2b8;
+  margin-top:10px;
   padding:10px;
-  border-radius:8px;
   font-size:24px;
 }
 
-/* 右 */
-.tools {
-  width:35%;
+/* 右側ツール */
+.tools{
   display:flex;
   flex-direction:column;
   gap:15px;
 }
 
-.tool {
+.tool{
   background:white;
   border-radius:15px;
   padding:15px;
   display:flex;
   align-items:center;
-  justify-content:center;
+  justify-content:space-between;
 }
 
-.tool-inner {
-  display:flex;
-  align-items:center;
-  gap:20px;
-}
-
-/* タイマー等 */
-.time-display {
+/* 数字 */
+.big{
   font-size:60px;
   font-weight:bold;
-  min-width:180px;
+  min-width:200px;
   text-align:center;
 }
 
-.buttons {
+/* ボタン群 */
+.btns{
   display:flex;
   flex-wrap:wrap;
   gap:6px;
   justify-content:center;
 }
 
-/* 抽選 */
-.random-display {
-  font-size:60px;
-  font-weight:bold;
-  min-width:120px;
-  text-align:center;
-}
-
-.random-max {
-  font-size:30px;
-  min-width:50px;
+/* 抽選固定幅 */
+.max{
   display:inline-block;
+  width:50px;
+  text-align:left;
 }
 </style>
 </head>
@@ -146,43 +139,28 @@ button {
 <body>
 
 <div class="top">
-<select id="classSelect">
+<select id="classSel">
 <option>1-1</option><option>1-2</option><option>1-3</option><option>1-4</option>
 <option>2-1</option><option>2-2</option><option>2-3</option><option>2-4</option>
 <option>3-1</option><option>3-2</option><option>3-3</option><option>3-4</option>
 <option>s-1</option><option>s-2</option><option>s-3</option>
 <option>a-1</option><option>a-2</option><option>a-3</option>
 </select>
-
-<button onclick="loadData()">↻</button>
+<button onclick="loadData()">🔄</button>
 </div>
 
 <div class="clock" id="clock"></div>
 
 <div class="main">
+<div class="card" id="today"></div>
+<div class="card" id="tomorrow"></div>
 
-<!-- 今日 -->
-<div class="schedule">
-<div class="date" id="todayDate"></div>
-<div id="todaySchedule"></div>
-<div class="plan" id="todayPlan"></div>
-</div>
-
-<!-- 明日 -->
-<div class="schedule">
-<div class="date" id="nextDate"></div>
-<div id="nextSchedule"></div>
-<div class="plan" id="nextPlan"></div>
-</div>
-
-<!-- ツール -->
 <div class="tools">
 
 <!-- タイマー -->
 <div class="tool">
-<div class="tool-inner">
-<div class="time-display" id="timer">00:00</div>
-<div class="buttons">
+<div class="big" id="timer">00:00</div>
+<div class="btns">
 <button onclick="addTime(600)">+10分</button>
 <button onclick="addTime(60)">+1分</button>
 <button onclick="addTime(10)">+10秒</button>
@@ -191,35 +169,27 @@ button {
 <button onclick="resetTimer()">リセット</button>
 </div>
 </div>
-</div>
 
 <!-- ストップウォッチ -->
 <div class="tool">
-<div class="tool-inner">
-<div class="time-display" id="stopwatch">00:00.0</div>
-<div class="buttons">
+<div class="big" id="sw">00:00.0</div>
+<div class="btns">
 <button onclick="startSW()">開始</button>
 <button onclick="stopSW()">停止</button>
 <button onclick="resetSW()">リセット</button>
 </div>
 </div>
-</div>
 
 <!-- 抽選 -->
 <div class="tool">
-<div class="tool-inner">
-<div>
-<span id="randomNumber" class="random-display">-</span>
-<span class="random-max"> / <span id="maxNumber">40</span></span>
-</div>
-<div class="buttons">
+<div class="big"><span id="rand">-</span> / <span class="max" id="max">40</span></div>
+<div class="btns">
 <button onclick="changeMax(-10)">-10</button>
 <button onclick="changeMax(-1)">-1</button>
 <button onclick="changeMax(1)">+1</button>
 <button onclick="changeMax(10)">+10</button>
 <button onclick="draw()">抽選</button>
-<button onclick="resetRandom()">リセット</button>
-</div>
+<button onclick="resetRand()">リセット</button>
 </div>
 </div>
 
@@ -227,175 +197,154 @@ button {
 </div>
 
 <script>
-
 /* 時計 */
 setInterval(()=>{
-const now=new Date();
-document.getElementById("clock").textContent=
-now.toLocaleTimeString("ja-JP",{hour12:false});
+  const d=new Date();
+  clock.textContent=d.toLocaleTimeString('ja-JP',{hour12:false});
 },1000);
 
 /* CSV */
-let csvData=[];
-
-function parseCSV(text){
-const rows=text.trim().split("\n").map(r=>r.split(","));
-const headers=rows[0];
-
-return rows.slice(1).map(row=>{
-let obj={};
-headers.forEach((h,i)=>{
-obj[h.trim()]=row[i]?row[i].trim():"";
-});
-return obj;
-});
-}
+let data=[];
 
 async function loadData(){
-const res=await fetch("https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6hu2HGH9XN1d3Pj8euPrv49TgqM-GsPJNqge6IiRoqvXpNWuRFteTEufF-ffT5WDpYtG4W25h4bxI/pub?gid=0&single=true&output=csv");
-const text=await res.text();
-csvData=parseCSV(text);
-render();
+  const res=await fetch("https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6hu2HGH9XN1d3Pj8euPrv49TgqM-GsPJNqge6IiRoqvXpNWuRFteTEufF-ffT5WDpYtG4W25h4bxI/pub?gid=0&single=true&output=csv");
+  const text=await res.text();
+  const rows=text.trim().split("\n").slice(1);
+  data=rows.map(r=>r.split(","));
+  render();
 }
 
-/* 日課取得 */
-function getData(date,cls){
-return csvData.find(r=>r.date===date && r.class===cls);
+function format(d){
+  return d.toISOString().split("T")[0];
 }
 
-/* 表示 */
+/* 日課表示（←ここ修正）*/
 function render(){
-const cls=document.getElementById("classSelect").value;
-const today=new Date();
-const next=new Date(today);
-next.setDate(today.getDate()+1);
+  const cls=document.getElementById("classSel").value;
+  const today=new Date();
+  const tomorrow=new Date(today);
+  tomorrow.setDate(today.getDate()+1);
 
-const tStr=today.toISOString().slice(0,10);
-const nStr=next.toISOString().slice(0,10);
-
-document.getElementById("todayDate").textContent=tStr;
-document.getElementById("nextDate").textContent=nStr;
-
-showSchedule(getData(tStr,cls),"today");
-showSchedule(getData(nStr,cls),"next");
+  show(today,"today",cls);
+  show(tomorrow,"tomorrow",cls);
 }
 
-function showSchedule(data,type){
-const area=document.getElementById(type+"Schedule");
-const plan=document.getElementById(type+"Plan");
+function show(date,id,cls){
+  const d=format(date);
 
-area.innerHTML="";
-plan.textContent="";
+  const row=data.find(r=>r[0]===d && r[1]===cls);
 
-if(!data)return;
+  if(!row){
+    document.getElementById(id).innerHTML="";
+    return;
+  }
 
-for(let i=1;i<=6;i++){
-const sub=data["p"+i];
-const row=document.createElement("div");
-row.className="row";
-row.innerHTML=`<div class="period">${i}時間目</div>
-<div class="subject">${sub||""}</div>`;
-area.appendChild(row);
-}
+  let html=`<div class="date">${d} ${row[8]}</div>`;
 
-plan.textContent=data.plan||"";
+  for(let i=0;i<6;i++){
+    html+=`
+    <div class="row">
+      <div class="period">${i+1}時間目</div>
+      <div class="subject">${row[2+i]||""}</div>
+    </div>`;
+  }
+
+  html+=`<div class="plan">${row[9]||""}</div>`;
+
+  document.getElementById(id).innerHTML=html;
 }
 
 /* タイマー */
-let timer=0,ti=null;
+let t=0,tid;
 
 function addTime(s){
-timer+=s;
-updateTimer();
+  t+=s;
+  updateTimer();
 }
 
 function updateTimer(){
-let m=Math.floor(timer/60);
-let s=timer%60;
-document.getElementById("timer").textContent=
-String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");
+  let m=Math.floor(t/60);
+  let s=t%60;
+  timer.textContent=
+    String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");
 }
 
 function startTimer(){
-if(ti)return;
-ti=setInterval(()=>{
-timer--;
-updateTimer();
-if(timer<=0){
-timer=0;
-clearInterval(ti);
-ti=null;
-playAlarm();
-}
-},1000);
+  clearInterval(tid);
+  tid=setInterval(()=>{
+    if(t>0){
+      t--;
+      updateTimer();
+
+      if(t===0){
+        alarm(); // ←ここで即鳴る
+      }
+
+    }
+  },1000);
 }
 
 function resetTimer(){
-timer=0;
-clearInterval(ti);
-ti=null;
-updateTimer();
+  clearInterval(tid);
+  t=0;
+  updateTimer();
 }
 
-/* アラーム */
-function playAlarm(){
-const ctx=new (window.AudioContext||window.webkitAudioContext)();
-let count=0;
+/* 🔔アラーム修正 */
+function alarm(){
+  let count=0;
 
-function beep(){
-const osc=ctx.createOscillator();
-const gain=ctx.createGain();
-osc.connect(gain);
-gain.connect(ctx.destination);
+  function beep4(){
+    let i=0;
+    const fast=setInterval(()=>{
+      const ctx=new AudioContext();
+      const o=ctx.createOscillator();
+      o.connect(ctx.destination);
+      o.start();
+      setTimeout(()=>o.stop(),80);
+      i++;
+      if(i===4) clearInterval(fast);
+    },120);
+  }
 
-osc.frequency.value=1200;
-gain.gain.value=0.2;
-
-osc.start();
-osc.stop(ctx.currentTime+0.15);
-
-count++;
-if(count<4){
-setTimeout(beep,1000);
-}
-}
-beep();
+  const loop=setInterval(()=>{
+    beep4();
+    count++;
+    if(count===4) clearInterval(loop);
+  },1000);
 }
 
 /* ストップウォッチ */
-let sw=0,swI=null;
+let swt=0,swid;
 
 function startSW(){
-if(swI)return;
-swI=setInterval(()=>{
-sw+=0.1;
-document.getElementById("stopwatch").textContent=
-sw.toFixed(1).padStart(6,"0");
-},100);
+  clearInterval(swid);
+  swid=setInterval(()=>{
+    swt+=0.1;
+    sw.textContent=swt.toFixed(1).padStart(6,"0");
+  },100);
 }
-function stopSW(){clearInterval(swI);swI=null;}
-function resetSW(){sw=0;stopSW();document.getElementById("stopwatch").textContent="00:00.0";}
+function stopSW(){clearInterval(swid);}
+function resetSW(){clearInterval(swid);swt=0;sw.textContent="00:00.0";}
 
 /* 抽選 */
 let max=40;
 
 function changeMax(v){
-max+=v;
-if(max<1)max=1;
-document.getElementById("maxNumber").textContent=max;
+  max=Math.max(1,max+v);
+  document.getElementById("max").textContent=String(max).padStart(2," ");
 }
 
 function draw(){
-const n=Math.floor(Math.random()*max)+1;
-document.getElementById("randomNumber").textContent=n;
+  rand.textContent=Math.floor(Math.random()*max)+1;
 }
 
-function resetRandom(){
-document.getElementById("randomNumber").textContent="-";
+function resetRand(){
+  rand.textContent="-";
 }
 
+/* 初期 */
 loadData();
-
 </script>
 
 </body>
