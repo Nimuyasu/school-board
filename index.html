@@ -13,7 +13,7 @@ body{
   font-family:'Noto Sans JP',sans-serif;
 }
 
-/* フィット */
+/* ===== フィット ===== */
 #wrapper{
   width:100vw;
   height:100vh;
@@ -26,10 +26,10 @@ body{
 #app{
   width:1920px;
   height:1080px;
-  transform-origin:center center;
+  transform-origin:center;
 }
 
-/* 時計 */
+/* ===== 時計 ===== */
 .top{
   height:22%;
   display:flex;
@@ -41,28 +41,28 @@ body{
   font-weight:700;
 }
 
-/* クラス */
+/* ===== クラス ===== */
 #control{
   position:absolute;
-  top:20px;
-  left:20px;
+  top:10px;
+  left:10px;
 }
 
-/* メイン */
+/* ===== メイン ===== */
 .main{
   display:flex;
   height:78%;
-  gap:10px;
-  padding:10px;
+  padding:5px;
   box-sizing:border-box;
+  gap:5px;
 }
 
-/* 日課 */
+/* ===== 日課 ===== */
 .card{
-  flex:0 0 30%;
+  flex:1;
   background:white;
-  border-radius:15px;
-  padding:12px;
+  border-radius:12px;
+  padding:10px 8px;
   display:flex;
   flex-direction:column;
 }
@@ -74,18 +74,21 @@ body{
 
 .row{
   display:flex;
-  margin:8px 0;
+  align-items:center; /* ←中央揃え */
+  margin:6px 0;
 }
 
 .period{
-  width:4.5em;
+  width:5em;
   font-size:3vh;
+  padding-left:6px; /* ←左余白 */
 }
 
 .subject{
   flex:1;
   font-size:5vh;
-  min-height:1.2em;
+  text-align:left;
+  padding-left:20px; /* ←中央寄せ */
 }
 .subject:empty::before{content:"　";}
 
@@ -93,32 +96,33 @@ body{
   font-size:4vh;
   background:#fff3cd;
   margin-top:auto;
-  padding:8px;
+  padding:6px;
   word-break:break-word;
 }
 
-/* 右 */
+/* ===== 右 ===== */
 .right{
-  flex:0 0 40%;
+  flex:1;
   display:flex;
   flex-direction:column;
-  gap:10px;
+  gap:5px;
 }
 
+/* ===== ツール ===== */
 .tool{
   flex:1;
   background:white;
-  border-radius:15px;
+  border-radius:12px;
   display:flex;
   justify-content:center;
   align-items:center;
   gap:20px;
-  padding:10px;
 }
 
 /* 数字 */
 .big{
   font-size:8vh;
+  width:260px; /* ←固定幅でズレ防止 */
   text-align:center;
 }
 
@@ -135,11 +139,11 @@ body{
 }
 
 button{
-  margin:3px;
-  padding:6px 10px;
+  margin:2px;
+  padding:5px 8px;
   font-size:3vh;
   border:none;
-  border-radius:8px;
+  border-radius:6px;
   background:#6fa8dc;
   color:white;
 }
@@ -147,10 +151,14 @@ button{
 /* 抽選 */
 .draw{
   display:flex;
-  align-items:baseline;
+  align-items:center;
   gap:10px;
 }
-.max{font-size:3vh;}
+.max{
+  font-size:3vh;
+  width:60px; /* ←固定 */
+  text-align:left;
+}
 </style>
 </head>
 
@@ -245,7 +253,6 @@ button{
 </div>
 
 <script>
-/* フィット */
 function fit(){
 const scale=Math.min(window.innerWidth/1920,window.innerHeight/1080);
 app.style.transform=`scale(${scale})`;
@@ -296,74 +303,34 @@ document.getElementById(id).innerHTML=h;
 
 async function load(){
 const data=await get();
-
 today.innerHTML=""; tomorrow.innerHTML="";
 todayP.textContent=""; tomorrowP.textContent="";
 
 const now=new Date();
+const k=key(now);
 
-/* 今日 */
-const todayKey=key(now);
-if(data[todayKey]){
-drawTable("today",data[todayKey]);
-todayH.textContent=makeHeader(now,data[todayKey][8]);
-todayP.textContent=data[todayKey][9]||"";
+if(data[k]){
+drawTable("today",data[k]);
+todayH.textContent=makeHeader(now,data[k][8]);
+todayP.textContent=data[k][9]||"";
 }
 
-/* 明日（空白スキップ） */
+/* 明日 */
 let d=new Date(now);
 for(let i=0;i<10;i++){
 d.setDate(d.getDate()+1);
-const k=key(d);
-if(data[k] && data[k].slice(2,8).some(v=>v)){
-drawTable("tomorrow",data[k]);
-tomorrowH.textContent=makeHeader(d,data[k][8]);
-tomorrowP.textContent=data[k][9]||"";
+const kk=key(d);
+if(data[kk] && data[kk].slice(2,8).some(v=>v)){
+drawTable("tomorrow",data[kk]);
+tomorrowH.textContent=makeHeader(d,data[kk][8]);
+tomorrowP.textContent=data[kk][9]||"";
 break;
 }
 }
 }
 
-function reload(){
-current=cls.value;
+function reload(){current=cls.value; load();}
 load();
-}
-
-load();
-
-/* タイマー */
-let t=0,ti;
-function format(s){return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;}
-function add(s){t+=s;timer.textContent=format(t);}
-function startT(){
-if(ti)return;
-ti=setInterval(()=>{
-if(t<=0){clearInterval(ti);ti=null;return;}
-t--;timer.textContent=format(t);
-},1000);
-}
-function resetT(){clearInterval(ti);ti=null;t=0;timer.textContent="00:00";}
-
-/* SW */
-let swt=0,swi;
-function startSW(){
-if(swi)return;
-swi=setInterval(()=>{
-swt++;
-let m=Math.floor(swt/600);
-let s=Math.floor((swt%600)/10);
-let ms=swt%10;
-sw.textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}.${ms}`;
-},100);
-}
-function stopSW(){clearInterval(swi);swi=null;}
-function resetSW(){stopSW();swt=0;sw.textContent="00:00.0";}
-
-/* 抽選 */
-let maxN=40;
-function chg(n){maxN+=n;if(maxN<1)maxN=1;max.textContent=maxN;}
-function draw(){res.textContent=Math.floor(Math.random()*maxN)+1;}
-function resetR(){res.textContent="-";}
 </script>
 
 </body>
