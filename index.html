@@ -9,12 +9,26 @@
 <style>
 body{
   margin:0;
-  font-family:'Noto Sans JP',sans-serif;
+  background:#000;
+}
+
+/* ===== 自動フィット用 ===== */
+#wrapper{
+  width:100vw;
+  height:100vh;
+  overflow:hidden;
   background:linear-gradient(135deg,#d9f3ff,#fff7d6);
+}
+
+#app{
+  width:1920px;
+  height:1080px;
+  transform-origin: top left;
+  font-family:'Noto Sans JP',sans-serif;
   overflow:hidden;
 }
 
-/* 時計（変更なし） */
+/* 時計 */
 .top{
   height:22vh;
   display:flex;
@@ -29,8 +43,8 @@ body{
 /* クラス */
 #control{
   position:absolute;
-  top:10px;
-  left:10px;
+  top:20px;
+  left:20px;
 }
 
 /* メイン */
@@ -42,14 +56,14 @@ body{
 /* 日課 */
 .card{
   flex:1.2;
-  margin:6px;
+  margin:10px;
   background:white;
-  border-radius:12px;
-  padding:12px;
+  border-radius:15px;
+  padding:15px;
 }
 
 .header{
-  font-size:5.6vh; /* ←2倍 */
+  font-size:5.6vh;
   text-align:center;
   font-weight:700;
 }
@@ -57,17 +71,17 @@ body{
 .row{
   display:flex;
   align-items:center;
-  margin:10px 0;
+  margin:12px 0;
 }
 
 .period{
-  width:5em;
-  font-size:3.2vh; /* ←2倍 */
+  width:6em;
+  font-size:3.2vh;
 }
 
 .subject{
   flex:1;
-  font-size:5.6vh; /* ←2倍 */
+  font-size:5.6vh;
   min-height:1.2em;
 }
 .subject:empty::before{
@@ -75,10 +89,10 @@ body{
 }
 
 .plan{
-  font-size:4.8vh; /* ←2倍 */
+  font-size:4.8vh;
   background:#fff3cd;
-  margin-top:8px;
-  padding:8px;
+  margin-top:10px;
+  padding:10px;
 }
 
 /* 右 */
@@ -91,23 +105,23 @@ body{
 .tool{
   flex:1;
   background:white;
-  margin:4px;
-  border-radius:12px;
+  margin:8px;
+  border-radius:15px;
   text-align:center;
-  padding:8px;
+  padding:10px;
 }
 
 .big{
-  font-size:9vh; /* ←2倍 */
+  font-size:9vh;
   font-weight:700;
 }
 
 button{
-  margin:3px;
-  padding:6px 10px;
-  font-size:3.2vh; /* ←2倍 */
+  margin:4px;
+  padding:8px 12px;
+  font-size:3.2vh;
   border:none;
-  border-radius:6px;
+  border-radius:8px;
   background:#6fa8dc;
   color:white;
 }
@@ -117,15 +131,18 @@ button{
   display:flex;
   justify-content:center;
   align-items:baseline;
-  gap:10px;
+  gap:12px;
 }
 .max{
-  font-size:4vh; /* ←2倍 */
+  font-size:4vh;
 }
 </style>
 </head>
 
 <body>
+
+<div id="wrapper">
+<div id="app">
 
 <div id="control">
 <select id="cls" style="font-size:3.2vh;"></select>
@@ -185,17 +202,32 @@ button{
 </div>
 </div>
 
-<script>
-const URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6hu2HGH9XN1d3Pj8euPrv49TgqM-GsPJNqge6IiRoqvXpNWuRFteTEufF-ffT5WDpYtG4W25h4bxI/pub?gid=0&single=true&output=csv";
+</div>
+</div>
 
+<script>
+/* ===== 自動フィット ===== */
+function fit(){
+  const w = window.innerWidth / 1920;
+  const h = window.innerHeight / 1080;
+  const scale = Math.min(w, h);
+  document.getElementById("app").style.transform = `scale(${scale})`;
+}
+window.addEventListener("resize", fit);
+fit();
+
+/* ===== クラス ===== */
 const list=["1-1","1-2","1-3","1-4","2-1","2-2","2-3","2-4","3-1","3-2","3-3","3-4"];
 list.forEach(c=>cls.innerHTML+=`<option>${c}</option>`);
-
 let current="3-1";
 
+/* 時計 */
 setInterval(()=>{
 clock.textContent=new Date().toLocaleTimeString();
 },1000);
+
+/* CSV */
+const URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6hu2HGH9XN1d3Pj8euPrv49TgqM-GsPJNqge6IiRoqvXpNWuRFteTEufF-ffT5WDpYtG4W25h4bxI/pub?gid=0&single=true&output=csv";
 
 async function get(){
 const t=await fetch(URL);
