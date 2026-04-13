@@ -12,7 +12,7 @@ body{
   background:#000;
 }
 
-/* ===== 自動フィット用 ===== */
+/* 自動フィット */
 #wrapper{
   width:100vw;
   height:100vh;
@@ -25,12 +25,11 @@ body{
   height:1080px;
   transform-origin: top left;
   font-family:'Noto Sans JP',sans-serif;
-  overflow:hidden;
 }
 
 /* 時計 */
 .top{
-  height:22vh;
+  height:20vh;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -50,12 +49,12 @@ body{
 /* メイン */
 .main{
   display:flex;
-  height:78vh;
+  height:80vh;
 }
 
-/* 日課 */
+/* 日課（少し細く） */
 .card{
-  flex:1.2;
+  flex:1;
   margin:10px;
   background:white;
   border-radius:15px;
@@ -71,11 +70,11 @@ body{
 .row{
   display:flex;
   align-items:center;
-  margin:12px 0;
+  margin:10px 0;
 }
 
 .period{
-  width:6em;
+  width:5em;
   font-size:3.2vh;
 }
 
@@ -92,12 +91,12 @@ body{
   font-size:4.8vh;
   background:#fff3cd;
   margin-top:10px;
-  padding:10px;
+  padding:8px;
 }
 
 /* 右 */
 .right{
-  flex:1.5;
+  flex:1.6;
   display:flex;
   flex-direction:column;
 }
@@ -105,10 +104,18 @@ body{
 .tool{
   flex:1;
   background:white;
-  margin:8px;
+  margin:6px;
   border-radius:15px;
-  text-align:center;
   padding:10px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+/* 左（数字） */
+.tool-left{
+  flex:1;
+  text-align:center;
 }
 
 .big{
@@ -116,9 +123,21 @@ body{
   font-weight:700;
 }
 
+/* 右（ボタン） */
+.tool-right{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+}
+
+/* 横並びボタン */
+.btn-row{
+  display:flex;
+}
+
 button{
-  margin:4px;
-  padding:8px 12px;
+  margin:3px;
+  padding:6px 10px;
   font-size:3.2vh;
   border:none;
   border-radius:8px;
@@ -131,7 +150,7 @@ button{
   display:flex;
   justify-content:center;
   align-items:baseline;
-  gap:12px;
+  gap:10px;
 }
 .max{
   font-size:4vh;
@@ -155,48 +174,78 @@ button{
 
 <div class="main">
 
+<!-- 今日 -->
 <div class="card">
 <div class="header" id="todayH"></div>
 <div id="today"></div>
 <div class="plan" id="todayP"></div>
 </div>
 
+<!-- 明日 -->
 <div class="card">
 <div class="header" id="tomorrowH"></div>
 <div id="tomorrow"></div>
 <div class="plan" id="tomorrowP"></div>
 </div>
 
+<!-- 右 -->
 <div class="right">
 
+<!-- タイマー -->
 <div class="tool">
+<div class="tool-left">
 <div class="big" id="timer">00:00</div>
+</div>
+<div class="tool-right">
+<div class="btn-row">
 <button onclick="add(600)">＋10分</button>
 <button onclick="add(60)">＋1分</button>
+</div>
+<div class="btn-row">
 <button onclick="add(10)">＋10秒</button>
-<button onclick="add(1)">＋1秒</button><br>
+<button onclick="add(1)">＋1秒</button>
+</div>
+<div class="btn-row">
 <button onclick="startT()">開始</button>
 <button onclick="resetT()">リセット</button>
 </div>
+</div>
+</div>
 
+<!-- ストップウォッチ -->
 <div class="tool">
+<div class="tool-left">
 <div class="big" id="sw">00:00.0</div>
+</div>
+<div class="tool-right">
+<div class="btn-row">
 <button onclick="startSW()">開始</button>
 <button onclick="stopSW()">停止</button>
 <button onclick="resetSW()">リセット</button>
 </div>
-
-<div class="tool">
-<div class="drawTop">
-  <div class="big" id="res">-</div>
-  <div class="max">/ <span id="max">40</span></div>
 </div>
+</div>
+
+<!-- 抽選 -->
+<div class="tool">
+<div class="tool-left">
+<div class="drawTop">
+<div class="big" id="res">-</div>
+<div class="max">/ <span id="max">40</span></div>
+</div>
+</div>
+<div class="tool-right">
+<div class="btn-row">
 <button onclick="chg(-10)">-10</button>
 <button onclick="chg(-1)">-1</button>
 <button onclick="chg(1)">+1</button>
-<button onclick="chg(10)">+10</button><br>
+<button onclick="chg(10)">+10</button>
+</div>
+<div class="btn-row">
 <button onclick="draw()">抽選</button>
 <button onclick="resetR()">リセット</button>
+</div>
+</div>
 </div>
 
 </div>
@@ -206,25 +255,22 @@ button{
 </div>
 
 <script>
-/* ===== 自動フィット ===== */
+/* フィット */
 function fit(){
-  const w = window.innerWidth / 1920;
-  const h = window.innerHeight / 1080;
-  const scale = Math.min(w, h);
-  document.getElementById("app").style.transform = `scale(${scale})`;
+const w = window.innerWidth / 1920;
+const h = window.innerHeight / 1080;
+document.getElementById("app").style.transform = `scale(${Math.min(w,h)})`;
 }
 window.addEventListener("resize", fit);
 fit();
 
-/* ===== クラス ===== */
+/* クラス */
 const list=["1-1","1-2","1-3","1-4","2-1","2-2","2-3","2-4","3-1","3-2","3-3","3-4"];
 list.forEach(c=>cls.innerHTML+=`<option>${c}</option>`);
 let current="3-1";
 
 /* 時計 */
-setInterval(()=>{
-clock.textContent=new Date().toLocaleTimeString();
-},1000);
+setInterval(()=>clock.textContent=new Date().toLocaleTimeString(),1000);
 
 /* CSV */
 const URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6hu2HGH9XN1d3Pj8euPrv49TgqM-GsPJNqge6IiRoqvXpNWuRFteTEufF-ffT5WDpYtG4W25h4bxI/pub?gid=0&single=true&output=csv";
@@ -244,9 +290,7 @@ data[c[0]]=c;
 return data;
 }
 
-function key(d){
-return d.toISOString().split("T")[0];
-}
+function key(d){return d.toISOString().split("T")[0];}
 
 function makeHeader(d,type){
 const w=["日","月","火","水","木","金","土"];
@@ -256,22 +300,15 @@ return `${d.getMonth()+1}/${d.getDate()}(${w[d.getDay()]})　${type||""}`;
 function drawTable(id,row){
 let h="";
 for(let i=2;i<=7;i++){
-h+=`
-<div class="row">
-  <div class="period">${i-1}時間目</div>
-  <div class="subject">${row[i]||""}</div>
-</div>`;
+h+=`<div class="row"><div class="period">${i-1}時間目</div><div class="subject">${row[i]||""}</div></div>`;
 }
 document.getElementById(id).innerHTML=h;
 }
 
 async function load(){
 const data=await get();
-
-today.innerHTML="";
-tomorrow.innerHTML="";
-todayP.textContent="";
-tomorrowP.textContent="";
+today.innerHTML=""; tomorrow.innerHTML="";
+todayP.textContent=""; tomorrowP.textContent="";
 
 const t=new Date();
 const k=key(t);
@@ -281,77 +318,20 @@ drawTable("today",data[k]);
 todayH.textContent=makeHeader(t,data[k][8]);
 todayP.textContent=data[k][9]||"";
 }
-
-let d=new Date();
-for(let i=0;i<7;i++){
-d.setDate(d.getDate()+1);
-if(d.getDay()==0||d.getDay()==6)continue;
-
-const kk=key(d);
-if(data[kk]){
-drawTable("tomorrow",data[kk]);
-tomorrowH.textContent=makeHeader(d,data[kk][8]);
-tomorrowP.textContent=data[kk][9]||"";
-break;
-}
-}
 }
 
-function reload(){
-current=cls.value;
+function reload(){current=cls.value; load();}
 load();
-}
-
-load();
-
-/* 音 */
-const ctx=new (window.AudioContext||window.webkitAudioContext)();
-
-function beep(){
-const o=ctx.createOscillator();
-const g=ctx.createGain();
-o.frequency.value=1200;
-o.connect(g);
-g.connect(ctx.destination);
-o.start();
-g.gain.setValueAtTime(1,ctx.currentTime);
-g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.1);
-o.stop(ctx.currentTime+0.1);
-}
-
-function playSet(){
-for(let i=0;i<4;i++){
-setTimeout(beep,i*120);
-}
-}
-
-function alarm(){
-playSet();
-let count=1;
-let int=setInterval(()=>{
-playSet();
-count++;
-if(count>=4) clearInterval(int);
-},1000);
-}
 
 /* タイマー */
 let t=0,ti;
-function format(s){
-return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
-}
+function format(s){return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;}
 function add(s){t+=s;timer.textContent=format(t);}
 function startT(){
 if(ti)return;
 ti=setInterval(()=>{
-if(t<=0){
-clearInterval(ti);
-ti=null;
-alarm();
-return;
-}
-t--;
-timer.textContent=format(t);
+if(t<=0){clearInterval(ti);ti=null;return;}
+t--;timer.textContent=format(t);
 },1000);
 }
 function resetT(){clearInterval(ti);ti=null;t=0;timer.textContent="00:00";}
