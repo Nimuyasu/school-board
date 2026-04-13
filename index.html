@@ -251,7 +251,9 @@ const URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6hu2HGH9XN1d3Pj8euP
 async function load(){
 const res=await fetch(URL);
 const txt=await res.text();
-const rows=txt.split("\n");
+
+/* ★修正：\r除去 */
+const rows=txt.split("\n").map(r=>r.replace(/\r/g,""));
 
 let data={};
 rows.forEach(r=>{
@@ -268,17 +270,25 @@ const w=["日","月","火","水","木","金","土"];
 return `${d.getMonth()+1}/${d.getDate()}(${w[d.getDay()]})`;
 }
 
+/* 今日 */
 if(data[k]){
 draw(today,data[k]);
 todayH.textContent=make(now)+" "+(data[k][8]||"");
 todayP.textContent=data[k][9]||"";
+}else{
+today.innerHTML="";
+todayP.textContent="";
 }
 
 /* 明日 */
 let d=new Date(now);
+tomorrow.innerHTML="";
+tomorrowP.textContent="";
+
 for(let i=0;i<10;i++){
 d.setDate(d.getDate()+1);
 let kk=d.toISOString().split("T")[0];
+
 if(data[kk] && data[kk].slice(2,8).some(v=>v)){
 draw(tomorrow,data[kk]);
 tomorrowH.textContent=make(d)+" "+(data[kk][8]||"");
@@ -302,34 +312,56 @@ el.innerHTML=h;
 function reload(){current=cls.value; load();}
 load();
 
-/* タイマー */
+/* ===== タイマー ===== */
 let t=0,ti;
 function add(s){t+=s;disp();}
 function disp(){
 timer.textContent=`${String(Math.floor(t/60)).padStart(2,'0')}:${String(t%60).padStart(2,'0')}`;
 }
+
+/* ★修正：アラーム */
 function beep(){
-for(let i=0;i<4;i++){
-setTimeout(()=>{
-let ctx=new AudioContext();
-let o=ctx.createOscillator();
-o.frequency.value=1000;
-o.connect(ctx.destination);
-o.start();
-setTimeout(()=>o.stop(),150);
-},i*1000);
+let count=0;
+
+function play(){
+if(count>=4)return;
+
+const ctx=new AudioContext();
+const osc=ctx.createOscillator();
+osc.type="square";
+osc.frequency.value=1000;
+
+osc.connect(ctx.destination);
+osc.start();
+
+/* ピピピピ（短く4連） */
+setTimeout(()=>osc.stop(),300);
+
+count++;
+setTimeout(play,1000);
 }
+
+play();
 }
+
 function startTimer(){
 if(ti)return;
+
 ti=setInterval(()=>{
-if(t<=0){clearInterval(ti);ti=null;beep();return;}
-t--;disp();
+if(t===0){
+clearInterval(ti);
+ti=null;
+beep(); // ★00:00瞬間発火
+return;
+}
+t--;
+disp();
 },1000);
 }
+
 function resetTimer(){clearInterval(ti);ti=null;t=0;disp();}
 
-/* SW */
+/* ===== SW ===== */
 let swt=0,swi;
 function startSW(){
 if(swi)return;
@@ -344,10 +376,20 @@ sw.textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}.${ms}`
 function stopSW(){clearInterval(swi);swi=null;}
 function resetSW(){stopSW();swt=0;sw.textContent="00:00.0";}
 
-/* 抽選 */
+/* ===== 抽選 ===== */
 let maxN=40;
-function chg(n){maxN+=n;if(maxN<1)maxN=1;max.textContent=maxN;}
-function draw(){res.textContent=Math.floor(Math.random()*maxN)+1;}
+
+/* ★修正：常に2桁 */
+function chg(n){
+maxN+=n;
+if(maxN<1)maxN=1;
+max.textContent=String(maxN).padStart(2,"0");
+}
+
+function draw(){
+res.textContent=Math.floor(Math.random()*maxN)+1;
+}
+
 function resetR(){res.textContent="-";}
 </script>
 
