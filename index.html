@@ -9,62 +9,56 @@
 <style>
 body{
   margin:0;
+  height:100vh;
   overflow:hidden;
   font-family:'Noto Sans JP',sans-serif;
-}
-
-/* ===== 背景 ===== */
-#wrapper{
-  width:100vw;
-  height:100vh;
   background:linear-gradient(135deg,#d9f3ff,#fff7d6);
+}
+
+/* ===== 全体 ===== */
+.container{
+  height:100%;
   display:flex;
-  justify-content:center;
-  align-items:center;
+  flex-direction:column;
 }
 
-#app{
-  width:1920px;
-  height:1080px;
-  transform-origin:center;
-}
-
-/* ===== 時計 ===== */
+/* ===== 上 ===== */
 .top{
   height:22%;
   display:flex;
   align-items:center;
   justify-content:center;
-}
-#clock{
-  font-size:18vh;
+  position:relative;
 }
 
-/* ===== クラス ===== */
+#clock{
+  font-size:13vh;
+}
+
+/* クラス */
 #control{
   position:absolute;
-  top:10px;
   left:10px;
+  top:10px;
 }
 #cls{
-  font-size:4vh; /* ←2倍 */
-}
-#control button{
   font-size:3vh;
 }
-
-/* ===== メイン ===== */
-.main{
-  display:flex;
-  height:78%;
-  gap:6px;
-  padding:6px;
-  box-sizing:border-box;
+#control button{
+  font-size:2.5vh;
 }
 
-/* ===== 日課 ===== */
+/* ===== 下 ===== */
+.main{
+  flex:1;
+  display:flex;
+  gap:10px;
+  padding:10px;
+}
+
+/* 日課 */
 .card{
-  flex:0 0 28%;
+  flex:1;
   background:white;
   border-radius:12px;
   padding:10px;
@@ -73,43 +67,41 @@ body{
 }
 
 .header{
-  font-size:5vh;
+  font-size:3.5vh;
   text-align:center;
 }
 
 .row{
   display:flex;
   align-items:center;
-  margin:6px 0;
+  margin:5px 0;
 }
 
 .period{
   width:5em;
-  font-size:3vh;
-  padding-left:10px;
+  font-size:2.5vh;
 }
 
 .subject{
   flex:1;
-  font-size:5vh;
-  padding-left:20px;
+  font-size:4vh;
+  padding-left:10px;
 }
 .subject:empty::before{content:"　";}
 
 .plan{
-  font-size:4vh;
+  font-size:2.8vh;
   background:#fff3cd;
   margin-top:auto;
   padding:6px;
-  word-break:break-word;
 }
 
-/* ===== 右 ===== */
+/* 右 */
 .right{
-  flex:0 0 44%;
+  flex:1.2;
   display:flex;
   flex-direction:column;
-  gap:6px;
+  gap:10px;
 }
 
 .tool{
@@ -117,15 +109,14 @@ body{
   background:white;
   border-radius:12px;
   display:flex;
-  justify-content:center;
   align-items:center;
-  gap:20px;
+  justify-content:space-around;
 }
 
 /* 数字 */
 .big{
-  font-size:8vh;
-  width:260px;
+  font-size:6vh;
+  width:200px;
   text-align:center;
 }
 
@@ -137,14 +128,13 @@ body{
 }
 .btn-row{
   display:flex;
-  justify-content:center;
 }
 button{
-  margin:3px;
-  padding:6px 10px;
-  font-size:3vh;
+  margin:2px;
+  padding:5px 8px;
+  font-size:2.5vh;
   border:none;
-  border-radius:8px;
+  border-radius:6px;
   background:#6fa8dc;
   color:white;
 }
@@ -156,46 +146,39 @@ button{
   gap:10px;
 }
 .max{
-  width:60px;
-  font-size:3vh;
+  font-size:2.5vh;
 }
 </style>
 </head>
 
 <body>
 
-<div id="wrapper">
-<div id="app">
+<div class="container">
 
+<div class="top">
 <div id="control">
 <select id="cls"></select>
 <button onclick="reload()">⟳</button>
 </div>
-
-<div class="top">
 <div id="clock"></div>
 </div>
 
 <div class="main">
 
-<!-- 今日 -->
 <div class="card">
 <div class="header" id="todayH"></div>
 <div id="today"></div>
 <div class="plan" id="todayP"></div>
 </div>
 
-<!-- 明日 -->
 <div class="card">
 <div class="header" id="tomorrowH"></div>
 <div id="tomorrow"></div>
 <div class="plan" id="tomorrowP"></div>
 </div>
 
-<!-- 右 -->
 <div class="right">
 
-<!-- タイマー -->
 <div class="tool">
 <div class="big" id="timer">00:00</div>
 <div class="buttons">
@@ -214,19 +197,15 @@ button{
 </div>
 </div>
 
-<!-- SW -->
 <div class="tool">
 <div class="big" id="sw">00:00.0</div>
 <div class="buttons">
-<div class="btn-row">
 <button onclick="startSW()">開始</button>
 <button onclick="stopSW()">停止</button>
 <button onclick="resetSW()">リセット</button>
 </div>
 </div>
-</div>
 
-<!-- 抽選 -->
 <div class="tool">
 <div class="draw">
 <div class="big" id="res">-</div>
@@ -250,16 +229,10 @@ button{
 </div>
 
 </div>
-</div>
 
 <script>
-/* フィット */
-function fit(){
-const scale=Math.min(window.innerWidth/1920,window.innerHeight/1080);
-app.style.transform=`scale(${scale})`;
-}
-window.addEventListener("resize",fit);
-fit();
+/* 時計 */
+setInterval(()=>clock.textContent=new Date().toLocaleTimeString(),1000);
 
 /* クラス */
 const list=[
@@ -272,50 +245,43 @@ const list=[
 list.forEach(c=>cls.innerHTML+=`<option>${c}</option>`);
 let current="3-1";
 
-/* 時計 */
-setInterval(()=>clock.textContent=new Date().toLocaleTimeString(),1000);
-
 /* CSV */
 const URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6hu2HGH9XN1d3Pj8euPrv49TgqM-GsPJNqge6IiRoqvXpNWuRFteTEufF-ffT5WDpYtG4W25h4bxI/pub?gid=0&single=true&output=csv";
 
-async function get(){
-const t=await fetch(URL);
-const tx=await t.text();
-const rows=tx.split("\n");
+async function load(){
+const res=await fetch(URL);
+const txt=await res.text();
+const rows=txt.split("\n");
+
 let data={};
 rows.forEach(r=>{
 let c=r.split(",");
-if(c.length<10)return;
 if(c[1]!=current)return;
 data[c[0]]=c;
 });
-return data;
-}
-
-function key(d){return d.toISOString().split("T")[0];}
-
-async function load(){
-const data=await get();
-today.innerHTML=""; tomorrow.innerHTML="";
-todayP.textContent=""; tomorrowP.textContent="";
 
 let now=new Date();
-let k=key(now);
+let k=now.toISOString().split("T")[0];
+
+function make(d){
+const w=["日","月","火","水","木","金","土"];
+return `${d.getMonth()+1}/${d.getDate()}(${w[d.getDay()]})`;
+}
 
 if(data[k]){
 draw(today,data[k]);
-todayH.textContent=k;
+todayH.textContent=make(now)+" "+(data[k][8]||"");
 todayP.textContent=data[k][9]||"";
 }
 
-/* 次の登校日 */
+/* 明日 */
 let d=new Date(now);
 for(let i=0;i<10;i++){
 d.setDate(d.getDate()+1);
-let kk=key(d);
+let kk=d.toISOString().split("T")[0];
 if(data[kk] && data[kk].slice(2,8).some(v=>v)){
 draw(tomorrow,data[kk]);
-tomorrowH.textContent=kk;
+tomorrowH.textContent=make(d)+" "+(data[kk][8]||"");
 tomorrowP.textContent=data[kk][9]||"";
 break;
 }
@@ -336,24 +302,22 @@ el.innerHTML=h;
 function reload(){current=cls.value; load();}
 load();
 
-/* ===== タイマー ===== */
+/* タイマー */
 let t=0,ti;
 function add(s){t+=s;disp();}
 function disp(){
-let m=String(Math.floor(t/60)).padStart(2,'0');
-let s=String(t%60).padStart(2,'0');
-timer.textContent=`${m}:${s}`;
+timer.textContent=`${String(Math.floor(t/60)).padStart(2,'0')}:${String(t%60).padStart(2,'0')}`;
 }
 function beep(){
-let ctx=new AudioContext();
 for(let i=0;i<4;i++){
 setTimeout(()=>{
+let ctx=new AudioContext();
 let o=ctx.createOscillator();
-o.frequency.value=1500;
+o.frequency.value=1000;
 o.connect(ctx.destination);
 o.start();
-setTimeout(()=>o.stop(),100);
-},i*200);
+setTimeout(()=>o.stop(),150);
+},i*1000);
 }
 }
 function startTimer(){
@@ -365,7 +329,7 @@ t--;disp();
 }
 function resetTimer(){clearInterval(ti);ti=null;t=0;disp();}
 
-/* ===== SW ===== */
+/* SW */
 let swt=0,swi;
 function startSW(){
 if(swi)return;
@@ -380,7 +344,7 @@ sw.textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}.${ms}`
 function stopSW(){clearInterval(swi);swi=null;}
 function resetSW(){stopSW();swt=0;sw.textContent="00:00.0";}
 
-/* ===== 抽選 ===== */
+/* 抽選 */
 let maxN=40;
 function chg(n){maxN+=n;if(maxN<1)maxN=1;max.textContent=maxN;}
 function draw(){res.textContent=Math.floor(Math.random()*maxN)+1;}
