@@ -320,37 +320,33 @@ timer.textContent=`${String(Math.floor(t/60)).padStart(2,'0')}:${String(t%60).pa
 }
 
 /* ★アラーム完全修正版 */
+let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
 function beep(){
-let setCount=0;
+  const now = audioCtx.currentTime;
 
-function oneSet(){
-let count=0;
+  // 4回 × 4セット
+  for(let set=0; set<4; set++){
+    for(let i=0; i<4; i++){
+      const t = now + set*1.0 + i*0.2;
 
-function beep4(){
-if(count>=4)return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
 
-const ctx=new AudioContext();
-const osc=ctx.createOscillator();
-osc.type="square";
-osc.frequency.value=900;
+      osc.type = "square";
+      osc.frequency.value = 1000;
 
-osc.connect(ctx.destination);
-osc.start();
-setTimeout(()=>osc.stop(),120);
+      gain.gain.setValueAtTime(0, t);
+      gain.gain.linearRampToValueAtTime(0.5, t + 0.01);
+      gain.gain.linearRampToValueAtTime(0, t + 0.15);
 
-count++;
-setTimeout(beep4,200); // ピピピピ（速い）
-}
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
 
-beep4();
-
-setCount++;
-if(setCount<4){
-setTimeout(oneSet,1000); // 1秒間隔
-}
-}
-
-oneSet();
+      osc.start(t);
+      osc.stop(t + 0.15);
+    }
+  }
 }
 
 function startTimer(){
