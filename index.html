@@ -9,27 +9,29 @@
 <style>
 body{
   margin:0;
-  background:#000;
+  overflow:hidden;
+  font-family:'Noto Sans JP',sans-serif;
 }
 
-/* 自動フィット */
+/* フィット */
 #wrapper{
   width:100vw;
   height:100vh;
-  overflow:hidden;
   background:linear-gradient(135deg,#d9f3ff,#fff7d6);
+  display:flex;
+  justify-content:center;
+  align-items:center;
 }
 
 #app{
   width:1920px;
   height:1080px;
-  transform-origin: top left;
-  font-family:'Noto Sans JP',sans-serif;
+  transform-origin:center center;
 }
 
 /* 時計 */
 .top{
-  height:20vh;
+  height:22%;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -49,96 +51,93 @@ body{
 /* メイン */
 .main{
   display:flex;
-  height:80vh;
+  height:78%;
+  gap:10px;
+  padding:10px;
+  box-sizing:border-box;
 }
 
-/* 日課（少し細く） */
+/* 日課 */
 .card{
-  flex:1;
-  margin:10px;
+  flex:0 0 30%;
   background:white;
   border-radius:15px;
-  padding:15px;
+  padding:12px;
+  display:flex;
+  flex-direction:column;
 }
 
 .header{
-  font-size:5.6vh;
+  font-size:5vh;
   text-align:center;
-  font-weight:700;
 }
 
 .row{
   display:flex;
-  align-items:center;
-  margin:10px 0;
+  margin:8px 0;
 }
 
 .period{
-  width:5em;
-  font-size:3.2vh;
+  width:4.5em;
+  font-size:3vh;
 }
 
 .subject{
   flex:1;
-  font-size:5.6vh;
+  font-size:5vh;
   min-height:1.2em;
 }
-.subject:empty::before{
-  content:"　";
-}
+.subject:empty::before{content:"　";}
 
 .plan{
-  font-size:4.8vh;
+  font-size:4vh;
   background:#fff3cd;
-  margin-top:10px;
+  margin-top:auto;
   padding:8px;
+  word-break:break-word;
 }
 
 /* 右 */
 .right{
-  flex:1.6;
+  flex:0 0 40%;
   display:flex;
   flex-direction:column;
+  gap:10px;
 }
 
 .tool{
   flex:1;
   background:white;
-  margin:6px;
   border-radius:15px;
-  padding:10px;
   display:flex;
+  justify-content:center;
   align-items:center;
-  justify-content:space-between;
+  gap:20px;
+  padding:10px;
 }
 
-/* 左（数字） */
-.tool-left{
-  flex:1;
+/* 数字 */
+.big{
+  font-size:8vh;
   text-align:center;
 }
 
-.big{
-  font-size:9vh;
-  font-weight:700;
-}
-
-/* 右（ボタン） */
-.tool-right{
+/* ボタン中央 */
+.buttons{
   display:flex;
   flex-direction:column;
-  align-items:flex-end;
+  align-items:center;
 }
 
-/* 横並びボタン */
 .btn-row{
   display:flex;
+  justify-content:center;
 }
 
 button{
   margin:3px;
   padding:6px 10px;
-  font-size:3.2vh;
+  font-size:3vh;
   border:none;
   border-radius:8px;
   background:#6fa8dc;
@@ -146,15 +145,12 @@ button{
 }
 
 /* 抽選 */
-.drawTop{
+.draw{
   display:flex;
-  justify-content:center;
   align-items:baseline;
   gap:10px;
 }
-.max{
-  font-size:4vh;
-}
+.max{font-size:3vh;}
 </style>
 </head>
 
@@ -164,7 +160,7 @@ button{
 <div id="app">
 
 <div id="control">
-<select id="cls" style="font-size:3.2vh;"></select>
+<select id="cls"></select>
 <button onclick="reload()">⟳</button>
 </div>
 
@@ -193,10 +189,8 @@ button{
 
 <!-- タイマー -->
 <div class="tool">
-<div class="tool-left">
 <div class="big" id="timer">00:00</div>
-</div>
-<div class="tool-right">
+<div class="buttons">
 <div class="btn-row">
 <button onclick="add(600)">＋10分</button>
 <button onclick="add(60)">＋1分</button>
@@ -212,12 +206,10 @@ button{
 </div>
 </div>
 
-<!-- ストップウォッチ -->
+<!-- SW -->
 <div class="tool">
-<div class="tool-left">
 <div class="big" id="sw">00:00.0</div>
-</div>
-<div class="tool-right">
+<div class="buttons">
 <div class="btn-row">
 <button onclick="startSW()">開始</button>
 <button onclick="stopSW()">停止</button>
@@ -228,13 +220,11 @@ button{
 
 <!-- 抽選 -->
 <div class="tool">
-<div class="tool-left">
-<div class="drawTop">
+<div class="draw">
 <div class="big" id="res">-</div>
 <div class="max">/ <span id="max">40</span></div>
 </div>
-</div>
-<div class="tool-right">
+<div class="buttons">
 <div class="btn-row">
 <button onclick="chg(-10)">-10</button>
 <button onclick="chg(-1)">-1</button>
@@ -257,11 +247,10 @@ button{
 <script>
 /* フィット */
 function fit(){
-const w = window.innerWidth / 1920;
-const h = window.innerHeight / 1080;
-document.getElementById("app").style.transform = `scale(${Math.min(w,h)})`;
+const scale=Math.min(window.innerWidth/1920,window.innerHeight/1080);
+app.style.transform=`scale(${scale})`;
 }
-window.addEventListener("resize", fit);
+window.addEventListener("resize",fit);
 fit();
 
 /* クラス */
@@ -307,20 +296,39 @@ document.getElementById(id).innerHTML=h;
 
 async function load(){
 const data=await get();
+
 today.innerHTML=""; tomorrow.innerHTML="";
 todayP.textContent=""; tomorrowP.textContent="";
 
-const t=new Date();
-const k=key(t);
+const now=new Date();
 
-if(data[k]){
-drawTable("today",data[k]);
-todayH.textContent=makeHeader(t,data[k][8]);
-todayP.textContent=data[k][9]||"";
+/* 今日 */
+const todayKey=key(now);
+if(data[todayKey]){
+drawTable("today",data[todayKey]);
+todayH.textContent=makeHeader(now,data[todayKey][8]);
+todayP.textContent=data[todayKey][9]||"";
+}
+
+/* 明日（空白スキップ） */
+let d=new Date(now);
+for(let i=0;i<10;i++){
+d.setDate(d.getDate()+1);
+const k=key(d);
+if(data[k] && data[k].slice(2,8).some(v=>v)){
+drawTable("tomorrow",data[k]);
+tomorrowH.textContent=makeHeader(d,data[k][8]);
+tomorrowP.textContent=data[k][9]||"";
+break;
 }
 }
+}
 
-function reload(){current=cls.value; load();}
+function reload(){
+current=cls.value;
+load();
+}
+
 load();
 
 /* タイマー */
