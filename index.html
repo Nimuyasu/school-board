@@ -252,7 +252,7 @@ async function load(){
 const res=await fetch(URL);
 const txt=await res.text();
 
-/* ★修正：\r除去 */
+/* 改行対策 */
 const rows=txt.split("\n").map(r=>r.replace(/\r/g,""));
 
 let data={};
@@ -319,29 +319,38 @@ function disp(){
 timer.textContent=`${String(Math.floor(t/60)).padStart(2,'0')}:${String(t%60).padStart(2,'0')}`;
 }
 
-/* ★修正：アラーム */
+/* ★アラーム完全修正版 */
 function beep(){
+let setCount=0;
+
+function oneSet(){
 let count=0;
 
-function play(){
+function beep4(){
 if(count>=4)return;
 
 const ctx=new AudioContext();
 const osc=ctx.createOscillator();
 osc.type="square";
-osc.frequency.value=1000;
+osc.frequency.value=900;
 
 osc.connect(ctx.destination);
 osc.start();
-
-/* ピピピピ（短く4連） */
-setTimeout(()=>osc.stop(),300);
+setTimeout(()=>osc.stop(),120);
 
 count++;
-setTimeout(play,1000);
+setTimeout(beep4,200); // ピピピピ（速い）
 }
 
-play();
+beep4();
+
+setCount++;
+if(setCount<4){
+setTimeout(oneSet,1000); // 1秒間隔
+}
+}
+
+oneSet();
 }
 
 function startTimer(){
@@ -351,7 +360,7 @@ ti=setInterval(()=>{
 if(t===0){
 clearInterval(ti);
 ti=null;
-beep(); // ★00:00瞬間発火
+beep(); // 即鳴る
 return;
 }
 t--;
@@ -379,14 +388,14 @@ function resetSW(){stopSW();swt=0;sw.textContent="00:00.0";}
 /* ===== 抽選 ===== */
 let maxN=40;
 
-/* ★修正：常に2桁 */
 function chg(n){
 maxN+=n;
 if(maxN<1)maxN=1;
-max.textContent=String(maxN).padStart(2,"0");
+max.textContent=maxN; // 表示はそのまま
 }
 
-function draw(){
+/* ★名前変更で衝突回避 */
+function drawNum(){
 res.textContent=Math.floor(Math.random()*maxN)+1;
 }
 
