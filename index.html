@@ -14,7 +14,7 @@ body{
   overflow:hidden;
 }
 
-/* 時計 */
+/* 時計（変更なし） */
 .top{
   height:22vh;
   display:flex;
@@ -22,7 +22,7 @@ body{
   justify-content:center;
 }
 #clock{
-  font-size:18vh; /* ← 1.5倍 */
+  font-size:18vh;
   font-weight:700;
 }
 
@@ -45,11 +45,11 @@ body{
   margin:6px;
   background:white;
   border-radius:12px;
-  padding:10px;
+  padding:12px;
 }
 
 .header{
-  font-size:2.8vh;
+  font-size:5.6vh; /* ←2倍 */
   text-align:center;
   font-weight:700;
 }
@@ -57,17 +57,17 @@ body{
 .row{
   display:flex;
   align-items:center;
-  margin:6px 0;
+  margin:10px 0;
 }
 
 .period{
   width:5em;
-  font-size:1.6vh;
+  font-size:3.2vh; /* ←2倍 */
 }
 
 .subject{
   flex:1;
-  font-size:2.8vh;
+  font-size:5.6vh; /* ←2倍 */
   min-height:1.2em;
 }
 .subject:empty::before{
@@ -75,10 +75,10 @@ body{
 }
 
 .plan{
-  font-size:2.4vh;
+  font-size:4.8vh; /* ←2倍 */
   background:#fff3cd;
-  margin-top:6px;
-  padding:5px;
+  margin-top:8px;
+  padding:8px;
 }
 
 /* 右 */
@@ -94,18 +94,18 @@ body{
   margin:4px;
   border-radius:12px;
   text-align:center;
-  padding:6px;
+  padding:8px;
 }
 
 .big{
-  font-size:4.5vh;
+  font-size:9vh; /* ←2倍 */
   font-weight:700;
 }
 
 button{
-  margin:2px;
-  padding:4px 6px;
-  font-size:1.6vh;
+  margin:3px;
+  padding:6px 10px;
+  font-size:3.2vh; /* ←2倍 */
   border:none;
   border-radius:6px;
   background:#6fa8dc;
@@ -117,10 +117,10 @@ button{
   display:flex;
   justify-content:center;
   align-items:baseline;
-  gap:6px;
+  gap:10px;
 }
 .max{
-  font-size:2vh;
+  font-size:4vh; /* ←2倍 */
 }
 </style>
 </head>
@@ -128,7 +128,7 @@ button{
 <body>
 
 <div id="control">
-<select id="cls"></select>
+<select id="cls" style="font-size:3.2vh;"></select>
 <button onclick="reload()">⟳</button>
 </div>
 
@@ -193,12 +193,10 @@ list.forEach(c=>cls.innerHTML+=`<option>${c}</option>`);
 
 let current="3-1";
 
-/* 時計 */
 setInterval(()=>{
 clock.textContent=new Date().toLocaleTimeString();
 },1000);
 
-/* CSV */
 async function get(){
 const t=await fetch(URL);
 const tx=await t.text();
@@ -296,7 +294,7 @@ setTimeout(beep,i*120);
 }
 
 function alarm(){
-playSet(); // 即鳴る
+playSet();
 let count=1;
 let int=setInterval(()=>{
 playSet();
@@ -324,12 +322,7 @@ t--;
 timer.textContent=format(t);
 },1000);
 }
-function resetT(){
-clearInterval(ti);
-ti=null;
-t=0;
-timer.textContent="00:00";
-}
+function resetT(){clearInterval(ti);ti=null;t=0;timer.textContent="00:00";}
 
 /* SW */
 let swt=0,swi;
