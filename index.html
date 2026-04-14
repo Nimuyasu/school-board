@@ -251,7 +251,6 @@ const URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6hu2HGH9XN1d3Pj8euP
 async function load(){
 const res=await fetch(URL);
 const txt=await res.text();
-const rows=txt.split("\n").map(r=>r.replace(/\r/g,""));
 
 /* 改行対策 */
 const rows=txt.split("\n").map(r=>r.replace(/\r/g,""));
