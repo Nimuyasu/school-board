@@ -58,7 +58,7 @@ body{
 
 /* 日課 */
 .card{
-  flex:1;
+  flex:0.8;
   background:white;
   border-radius:12px;
   padding:10px;
@@ -105,7 +105,7 @@ body{
 }
 
 .tool{
-  flex:1;
+  flex:0.8;
   background:white;
   border-radius:12px;
   display:flex;
@@ -251,6 +251,7 @@ const URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6hu2HGH9XN1d3Pj8euP
 async function load(){
 const res=await fetch(URL);
 const txt=await res.text();
+const rows=txt.split("\n").map(r=>r.replace(/\r/g,""));
 
 /* 改行対策 */
 const rows=txt.split("\n").map(r=>r.replace(/\r/g,""));
@@ -270,20 +271,21 @@ const w=["日","月","火","水","木","金","土"];
 return `${d.getMonth()+1}/${d.getDate()}(${w[d.getDay()]})`;
 }
 
-/* 今日 */
-if(data[k]){
+today.innerHTML="";
+todayP.textContent="";
+todayH.textContent="";
+
+if(data[k] && data[k].slice(2,8).some(v=>v)){
 draw(today,data[k]);
 todayH.textContent=make(now)+" "+(data[k][8]||"");
 todayP.textContent=data[k][9]||"";
-}else{
-today.innerHTML="";
-todayP.textContent="";
 }
 
-/* 明日 */
+/* ===== 翌日（次の登校日） ===== */
 let d=new Date(now);
 tomorrow.innerHTML="";
 tomorrowP.textContent="";
+tomorrowH.textContent="";
 
 for(let i=0;i<10;i++){
 d.setDate(d.getDate()+1);
