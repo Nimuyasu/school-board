@@ -68,7 +68,7 @@ body{
 }
 
 .header{
-  font-size:3.5vh;
+  font-size:4.5vh;
   text-align:center;
 }
 
@@ -80,18 +80,18 @@ body{
 
 .period{
   width:5em;
-  font-size:2.5vh;
+  font-size:3.2vh;
 }
 
 .subject{
   flex:1;
-  font-size:4vh;
+  font-size:5.2vh;
   padding-left:10px;
 }
 .subject:empty::before{content:"　";}
 
 .plan{
-  font-size:2.8vh;
+  font-size:3.6vh;
   background:#fff3cd;
   margin-top:auto;
   padding:4px;
@@ -264,7 +264,9 @@ data[c[0]]=c;
 });
 
 let now=new Date();
-let k=now.toISOString().split("T")[0];
+let k = now.getFullYear() + "-" +
+  String(now.getMonth()+1).padStart(2,"0") + "-" +
+  String(now.getDate()).padStart(2,"0");
 
 function make(d){
 const w=["日","月","火","水","木","金","土"];
@@ -289,7 +291,9 @@ tomorrowH.textContent="";
 
 for(let i=0;i<10;i++){
 d.setDate(d.getDate()+1);
-let kk=d.toISOString().split("T")[0];
+let kk = d.getFullYear() + "-" +
+  String(d.getMonth()+1).padStart(2,"0") + "-" +
+  String(d.getDate()).padStart(2,"0");
 
 if(data[kk] && data[kk].slice(2,8).some(v=>v)){
 draw(tomorrow,data[kk]);
@@ -339,7 +343,7 @@ function beep(){
       osc.frequency.value = 1000;
 
       gain.gain.setValueAtTime(0, t);
-      gain.gain.linearRampToValueAtTime(0.25, t + 0.01);
+      gain.gain.linearRampToValueAtTime(0.1, t + 0.01);
       gain.gain.linearRampToValueAtTime(0, t + 0.15);
 
       osc.connect(gain);
