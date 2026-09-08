@@ -51,6 +51,7 @@ body{
 /* ===== 下 ===== */
 .main{
   flex:1;
+  min-height:0;
   display:flex;
   gap:6px;
   padding:6px;
@@ -60,9 +61,11 @@ body{
 /* ===== 日課 ===== */
 .card{
   flex:0.65;
+  min-height:0;
+  box-sizing:border-box;
   background:white;
   border-radius:12px;
-  padding:6px;
+  padding:12px;
   display:flex;
   flex-direction:column;
 }
@@ -70,13 +73,15 @@ body{
 /* ===== 時程 ===== */
 .schedule{
   flex:0.42;
+  min-height:0;
+  box-sizing:border-box;
   background:white;
   border-radius:12px;
   padding:6px;
   display:flex;
   flex-direction:column;
+  overflow:hidden;
 }
-
 /* 「時程」の文字は表示しないが、
    1時間目の高さを合わせるためのスペースは残す */
 .schedule .header{
@@ -99,7 +104,7 @@ body{
 
 /* 時刻 */
 .schedule .time{
-  font-size:3.0vh;
+  font-size:4.0vh;
   line-height:1;
   text-align:center;
 }
@@ -146,12 +151,15 @@ body{
 }
 
 .tool{
-  height:30%;   /* ← これが本命 */
+  height:30%;
+  min-height:0;
   background:white;
   border-radius:12px;
   display:flex;
   align-items:center;
-  justify-content:space-around;
+  justify-content:space-between;
+  padding:0 4px;
+  box-sizing:border-box;
 }
 
 /* 数字 */
