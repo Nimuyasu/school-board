@@ -57,7 +57,7 @@ body{
   box-sizing:border-box;
 }
 
-/* 日課 */
+/* ===== 日課 ===== */
 .card{
   flex:0.65;
   background:white;
@@ -68,7 +68,6 @@ body{
 }
 
 /* ===== 時程 ===== */
-/* ===== 時程 ===== */
 .schedule{
   flex:0.42;
   background:white;
@@ -78,29 +77,34 @@ body{
   flex-direction:column;
 }
 
+/* 「時程」の文字は表示しないが、
+   1時間目の高さを合わせるためのスペースは残す */
 .schedule .header{
-  height:5.2vh;
-  line-height:5.2vh;
+  height:6.5vh;
+  line-height:6.5vh;
   font-size:4.5vh;
   text-align:center;
   visibility:hidden;
 }
 
+/* 日課の「1時間目～6時間目」と同じ間隔にする */
 .schedule .row{
   display:flex;
   align-items:center;
   justify-content:center;
   margin:3px 0;
-  height:5.2vh;
+  height:7vh;
   box-sizing:border-box;
 }
 
+/* 時刻 */
 .schedule .time{
   font-size:3.0vh;
-  line-height:5.2vh;
+  line-height:1;
   text-align:center;
 }
 
+/* ===== 日課共通 ===== */
 .header{
   font-size:4.5vh;
   text-align:center;
@@ -121,6 +125,16 @@ body{
   flex:1;
   font-size:5.2vh;
   padding-left:10px;
+}
+
+/* ===== 連絡 ===== */
+.plan{
+  font-size:3.6vh;
+  line-height:1.45;
+  background:#fff3cd;
+  margin-top:auto;
+  padding:6px;
+  box-sizing:border-box;
 }
 
 /* 右 */
