@@ -88,7 +88,7 @@ body{
   align-items:center;
   justify-content:center;
   margin:3px 0;
-  height:7.6vh;
+  height:7.5vh;
   box-sizing:border-box;
 }
 
@@ -413,46 +413,55 @@ async function load(){
   }
 
 
-  /* ===== 時程 ===== */
+/* ===== 時程 ===== */
 
-  scheduleToday.innerHTML="";
+scheduleToday.innerHTML="";
 
-  if(scheduleData[k]){
+if(scheduleData[k] && data[k]){
 
-    const s=scheduleData[k];
+  const s=scheduleData[k];
+  const d=data[k];
 
-    let h="";
+  let h="";
 
-    /*
-      0 = date
-      1 = class
-      2 = break
-      3 = time
-      4 = p1
-      5 = p2
-      6 = p3
-      7 = p4
-      8 = p5
-      9 = p6
-    */
+  /*
+    Sheet1（日課）
+    2 = 1時間目
+    3 = 2時間目
+    4 = 3時間目
+    5 = 4時間目
+    6 = 5時間目
+    7 = 6時間目
 
-    for(let i=4;i<=9;i++){
+    Sheet2（時程）
+    4 = 1時間目終了 p1
+    5 = 2時間目終了 p2
+    6 = 3時間目終了 p3
+    7 = 4時間目終了 p4
+    8 = 5時間目終了 p5
+    9 = 6時間目終了 p6
+  */
 
-      if(s[i]){
+  for(let i=4;i<=9;i++){
 
-        h+=`
-        <div class="row">
-          <div class="time">${s[i]}～</div>
-        </div>
-        `;
+    const dayIndex=i-2;
 
-      }
+    /* Sheet1の日課がある時間だけ表示 */
+    if(d[dayIndex]){
+
+      h+=`
+      <div class="row">
+        <div class="time">～${s[i]}</div>
+      </div>
+      `;
 
     }
 
-    scheduleToday.innerHTML=h;
-
   }
+
+  scheduleToday.innerHTML=h;
+
+}
 
 
   /* ===== 本日 ===== */
@@ -518,10 +527,14 @@ let h="";
 
 for(let i=2;i<=7;i++){
 
-h+=`<div class="row">
+  if(row[i]){
+
+    h+=`<div class="row">
 <div class="period">${i-1}時間目</div>
-<div class="subject">${row[i]||""}</div>
+<div class="subject">${row[i]}</div>
 </div>`;
+
+  }
 
 }
 
