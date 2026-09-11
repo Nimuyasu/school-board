@@ -433,32 +433,31 @@ if(scheduleData[k] && data[k]){
     6 = 5時間目
     7 = 6時間目
 
-    Sheet2（時程）
-    4 = 1時間目終了 p1
-    5 = 2時間目終了 p2
-    6 = 3時間目終了 p3
-    7 = 4時間目終了 p4
-    8 = 5時間目終了 p5
-    9 = 6時間目終了 p6
-  */
+  Sheet2（時程）
+  5 = 1時間目終了 p1
+  6 = 2時間目終了 p2
+  7 = 3時間目終了 p3
+  8 = 4時間目終了 p4
+  9 = 5時間目終了 p5
+  10 = 6時間目終了 p6
+*/
 
-  for(let i=4;i<=9;i++){
+for(let i=5;i<=10;i++){
 
-    const dayIndex=i-2;
+  const dayIndex=i-3;
 
-    /* Sheet1の日課がある時間だけ表示 */
-    if(d[dayIndex]){
+  /* Sheet1の日課がある時間だけ表示 */
+  if(d[dayIndex]){
 
-      h+=`
-      <div class="row">
-        <div class="time">～${s[i]}</div>
-      </div>
-      `;
-
-    }
+    h+=`
+    <div class="row">
+      <div class="time">～${s[i]}</div>
+    </div>
+    `;
 
   }
 
+}
   scheduleToday.innerHTML=h;
 
 }
